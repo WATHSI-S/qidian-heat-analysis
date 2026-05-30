@@ -1,0 +1,189 @@
+/* ===============================================
+   起点天榜 · 风向分析 — Trends-specific styles
+   Extends style.css (must be loaded after it)
+   =============================================== */
+
+/* ── Hero Compact ── */
+.hero-compact {
+  padding: 32px 20px 28px;
+  text-align: center;
+  position: relative; z-index: 1;
+  background: radial-gradient(ellipse 80% 50% at 50% 40%, rgba(201,169,110,0.06) 0%, transparent 70%),
+              linear-gradient(180deg, #1a1610 0%, var(--ink) 100%);
+}
+.hero-compact .hero-title { font-size: 36px; letter-spacing: 4px; }
+.hero-compact .hero-sub { font-size: 14px; letter-spacing: 6px; }
+
+/* ── Mark accent colors ── */
+.mark-accent .mark-val { color: var(--vermillion-bright); }
+
+/* ── Section intro text ── */
+.section-intro {
+  font-size: 12px; color: var(--text-dim); line-height: 1.8;
+  margin-bottom: 14px; padding: 10px 14px;
+  background: rgba(30,27,21,0.4);
+  border-left: 2px solid var(--gold-dim);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+/* ── Momentum Table ── */
+.mom-score {
+  font-family: var(--font-serif); font-weight: 700; font-size: 14px;
+}
+.mom-score.up    { color: #2ecc71; }
+.mom-score.down  { color: #e74c3c; }
+.mom-score.stable { color: var(--text-dim); }
+
+.td-bar-wrap {
+  width: 100px; height: 6px;
+  background: rgba(54,47,38,0.4);
+  border-radius: 3px;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+}
+.td-bar-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+/* ── Recommendation Cards ── */
+.rec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.rec-card {
+  background: rgba(30,27,21,0.5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  transition: border-color 0.3s, transform 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.rec-card:hover { border-color: var(--border-gold); transform: translateY(-2px); }
+
+.rec-card.rec-top1 { border-color: rgba(201,169,110,0.35); background: rgba(201,169,110,0.05); }
+.rec-card.rec-top2 { border-color: rgba(192,192,192,0.25); background: rgba(192,192,192,0.03); }
+.rec-card.rec-top3 { border-color: rgba(205,127,50,0.25); background: rgba(205,127,50,0.03); }
+
+.rec-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+}
+.rec-badge {
+  flex-shrink: 0; width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  font-family: var(--font-serif); font-size: 22px; font-weight: 900;
+}
+.rec-top1 .rec-badge { background: rgba(201,169,110,0.2); color: var(--gold); box-shadow: 0 0 16px rgba(201,169,110,0.15); }
+.rec-top2 .rec-badge { background: rgba(192,192,192,0.15); color: #ccc; }
+.rec-top3 .rec-badge { background: rgba(205,127,50,0.15); color: #cd7f32; }
+.rec-badge.rec-norm { background: rgba(54,47,38,0.4); color: var(--text-dim); }
+
+.rec-cat {
+  font-family: var(--font-serif); font-size: 16px; font-weight: 600;
+  color: var(--gold); letter-spacing: 1px;
+}
+.rec-score-tag {
+  margin-left: auto; padding: 4px 12px; border-radius: 14px;
+  font-family: var(--font-serif); font-size: 13px; font-weight: 700;
+  background: rgba(201,169,110,0.12); color: var(--gold-light);
+  border: 1px solid rgba(201,169,110,0.25);
+  white-space: nowrap;
+}
+
+.rec-body { font-size: 12px; line-height: 1.9; }
+
+.rec-metrics {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin-bottom: 12px;
+}
+.rec-metric {
+  padding: 8px 10px;
+  background: rgba(0,0,0,0.15);
+  border-radius: var(--radius);
+  text-align: center;
+}
+.rec-metric-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; }
+.rec-metric-val { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 2px; }
+.rec-metric-val.good { color: #2ecc71; }
+.rec-metric-val.warn { color: #e67e22; }
+.rec-metric-val.hot  { color: var(--vermillion-bright); }
+
+.rec-advice {
+  padding: 12px 14px;
+  background: rgba(201,169,110,0.04);
+  border: 1px solid rgba(201,169,110,0.12);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+}
+
+.rec-advice-title {
+  font-size: 10px; color: var(--gold-dim); letter-spacing: 2px;
+  margin-bottom: 6px; text-transform: uppercase;
+}
+.rec-advice p { margin: 0; }
+
+.rec-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.rec-tag {
+  padding: 3px 10px; border-radius: 12px;
+  font-size: 10px; letter-spacing: 1px;
+  background: rgba(91,141,184,0.1); color: #7ab8e8;
+  border: 1px solid rgba(91,141,184,0.2);
+}
+
+/* ── Radar alternative: score bars ── */
+.factor-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+}
+.factor-label {
+  width: 70px; font-size: 11px; color: var(--text-dim); text-align: right; flex-shrink: 0;
+}
+.factor-bar {
+  flex: 1; height: 6px; background: rgba(54,47,38,0.4); border-radius: 3px; overflow: hidden;
+}
+.factor-fill { height: 100%; border-radius: 3px; }
+.factor-val {
+  width: 36px; font-size: 11px; font-weight: 600; color: var(--text); flex-shrink: 0;
+}
+
+/* ── Trend direction banners ── */
+.trend-banner {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px; border-radius: var(--radius);
+  background: rgba(30,27,21,0.5); border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.trend-banner-icon { font-size: 20px; flex-shrink: 0; }
+.trend-banner-text { flex: 1; }
+.trend-banner-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.trend-banner-desc { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+/* ── Two column layout ── */
+.panel-row-charts {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+}
+
+/* ── Market signal donut legend ── */
+.signal-legend {
+  display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 8px;
+}
+.signal-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text-dim);
+}
+.signal-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+
+.chart-lg { height: 440px; }
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+  .hero-compact .hero-title { font-size: 26px; letter-spacing: 2px; }
+  .rec-grid { grid-template-columns: 1fr; }
+  .panel-row-charts { grid-template-columns: 1fr; }
+}

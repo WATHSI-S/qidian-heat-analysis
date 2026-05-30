@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>起点天榜 · 深度分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="analysis.css">
+</head>
+<body>
+
+<div class="noise-overlay"></div>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">起点 · 天榜</a>
+  <div class="nav-links">
+    <a href="index.html">总览</a>
+    <a href="analysis.html" class="active">深度分析</a>
+    <a href="trends.html">风向推荐</a>
+  </div>
+</nav>
+
+<header class="hero hero-compact">
+  <h1 class="hero-title">
+    <span class="title-brush">深度</span>
+    <span class="title-divider">·</span>
+    <span class="title-brush">分析</span>
+  </h1>
+  <p class="hero-sub">算法洞察 · 数理窥天</p>
+  <p class="hero-desc">综合热度指数、排名异动追踪、霸榜常青统计、分类竞争格局<br/>以数据之眼，观网文江湖沉浮</p>
+  <p class="hero-time" id="updateTime">— 等待天机降临 —</p>
+</header>
+
+<main class="board">
+
+  <!-- Overview Marks -->
+  <section class="marks-row" id="analysisStats"></section>
+
+  <!-- 综合热度总榜 -->
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">综合热度总榜</h2>
+      <span style="font-size:11px;color:var(--text-muted)">加权算法: Σ(榜位权重 / √排名) · 月票1.0 畅销0.95 阅读0.85 推荐0.8 收藏0.75 签约0.7 书友0.6 更新0.5</span>
+    </div>
+    <div class="scroll-box" style="max-height:600px">
+      <table id="heatTable">
+        <thead>
+          <tr>
+            <th>热度排名</th><th>书名</th><th>作者</th><th>分类</th>
+            <th>热度分</th><th>上榜榜单</th><th>最佳排名</th><th>热度动量</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 排名异动追踪 -->
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">排名异动追踪</h2>
+      <span id="changesStats" style="font-size:12px;color:var(--text-dim)"></span>
+      <nav class="rank-pills" id="changesTabs"></nav>
+    </div>
+    <div class="scroll-box" style="max-height:520px">
+      <table id="changesTable">
+        <thead>
+          <tr><th>#</th><th>书名</th><th>作者</th><th>上周</th><th>本周</th><th>变化</th><th>分类</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Charts Row: Longevity + Coverage -->
+  <div class="panel-row">
+    <section class="panel">
+      <h2 class="panel-title">霸榜常青 — 累计上榜周数</h2>
+      <div class="chart-container chart-lg" id="chart-longevity"></div>
+    </section>
+    <section class="panel">
+      <h2 class="panel-title">榜单覆盖度 — 同时霸占几榜</h2>
+      <div class="chart-container chart-lg" id="chart-coverage"></div>
+    </section>
+  </div>
+
+  <!-- Category Rankings Grid -->
+  <section class="panel">
+    <h2 class="panel-title">分类争锋 — 各品类热度排行</h2>
+    <div class="cat-grid" id="categoryGrid"></div>
+  </section>
+
+</main>
+
+<footer class="endnote">
+  <p>数据来源 <a href="https://www.qidian.com" target="_blank" rel="noopener">起点中文网</a> 公开榜位 · 每周一早八时天机自动更新</p>
+</footer>
+
+<script src="analysis.js"></script>
+</body>
+</html>

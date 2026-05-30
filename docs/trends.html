@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>起点天榜 · 风向分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="trends.css">
+</head>
+<body>
+
+<div class="noise-overlay"></div>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">起点 · 天榜</a>
+  <div class="nav-links">
+    <a href="index.html">总览</a>
+    <a href="analysis.html">深度分析</a>
+    <a href="trends.html" class="active">风向推荐</a>
+  </div>
+</nav>
+
+<header class="hero hero-compact">
+  <h1 class="hero-title">
+    <span class="title-brush">风向</span>
+    <span class="title-divider">·</span>
+    <span class="title-brush">推荐</span>
+  </h1>
+  <p class="hero-sub">市场洞察 · 题材导航</p>
+  <p class="hero-desc">多因子市场缺口分析、分类动量追踪、写作题材智能推荐<br/>以算法之眼，寻网文风口赛道</p>
+  <p class="hero-time" id="updateTime">— 等待天机降临 —</p>
+</header>
+
+<main class="board">
+
+  <!-- Overview Marks -->
+  <section class="marks-row" id="trendStats"></section>
+
+  <!-- Entry Friendliness -->
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">新人友好度 — 哪类更容易突围</h2>
+      <span style="font-size:11px;color:var(--text-muted)">三因子模型: 签约新书密度×0.45 + 竞争分散度×0.30 + 排名可及性×0.25</span>
+    </div>
+    <div class="section-intro">
+      <b>签约新书密度</b>（蓝）— 起点签约新书榜在该品类的占比，最直接的新书活跃度指标；
+      <b>竞争分散度</b>（绿）— 头部（Top 3）热度占比越低、市场越分散，新人越有机会；
+      <b>排名可及性</b>（紫）— 整体排名越靠前，榜单可及性越高，新人更容易被读者发现。
+      三项归一化后加权合成 0-100 的友好度评分。不依赖周间数据对比，仅用当前周截面数据。
+    </div>
+    <div class="chart-container chart-lg" id="chart-entry"></div>
+  </section>
+
+  <!-- Category Momentum -->
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">分类动量 — 谁在风口之上</h2>
+      <span style="font-size:11px;color:var(--text-muted)">动量指数 = tanh(热度变化率/30)×0.6 + tanh(书目变化率/20)×0.4，归一化至 ±100</span>
+    </div>
+    <div class="section-intro">
+      正值（绿）表示该分类本周总热度与书目数双增；负值（红）表示降温。使用 tanh 阻尼函数防止小品类因基数低而产生极端波动。
+    </div>
+    <div class="chart-container chart-lg" id="chart-momentum"></div>
+  </section>
+
+  <!-- Market Gap Analysis -->
+  <div class="panel-row-charts">
+    <section class="panel">
+      <h2 class="panel-title">多维雷达 — 品类因子轮廓对比</h2>
+      <div class="section-intro">
+        雷达图对比各品类在 <b>需求信号</b>、<b>竞争空间</b>（1−头部集中度）、<b>新人友好</b>、<b>增长动量</b> 四个维度的表现。
+        覆盖面积越大、轮廓越均衡，说明品类综合机会越优。可点击图例筛选特定品类。
+      </div>
+      <div class="chart-container chart-lg" id="chart-market"></div>
+    </section>
+    <section class="panel">
+      <h2 class="panel-title">风口评分明细</h2>
+      <div class="scroll-box" style="max-height:440px">
+        <table id="gapTable">
+          <thead>
+            <tr>
+              <th>#</th><th>分类</th><th>风口指数</th><th>需求信号</th>
+              <th>竞争强度</th><th>新人友好</th><th>增长动量</th><th>书数</th><th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Writing Recommendations -->
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">写作题材推荐 — 风口赛道导航</h2>
+      <span style="font-size:11px;color:var(--text-muted)">风口指数(MGS): 需求信号×0.35 + 竞争空间×0.25 + 新人友好×0.25 + 增长动量×0.15</span>
+    </div>
+    <div class="section-intro">
+      以下推荐基于多因子加权模型，综合考量读者付费需求、市场竞争格局、新书突围难度、以及近期增长趋势。排名越靠前，代表当前市场机会越显著。
+    </div>
+    <div class="rec-grid" id="recGrid"></div>
+  </section>
+
+  <!-- Trend Direction -->
+  <section class="panel">
+    <h2 class="panel-title">风向总览</h2>
+    <div id="trendBanners"></div>
+  </section>
+
+</main>
+
+<footer class="endnote">
+  <p>数据来源 <a href="https://www.qidian.com" target="_blank" rel="noopener">起点中文网</a> 公开榜位 · 每周一早八时天机自动更新 · 推荐算法仅供参考</p>
+</footer>
+
+<script src="trends.js"></script>
+</body>
+</html>
