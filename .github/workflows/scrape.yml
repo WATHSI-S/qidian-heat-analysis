@@ -2,9 +2,8 @@ name: Weekly Qidian Scrape
 
 on:
   schedule:
-    # Every Monday at 00:00 UTC (8:00 AM Beijing time)
     - cron: '0 0 * * 1'
-  workflow_dispatch:  # allow manual trigger
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -12,14 +11,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: 'pip'
 
       - name: Install dependencies
         run: |
