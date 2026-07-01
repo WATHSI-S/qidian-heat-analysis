@@ -41,3 +41,13 @@ jobs:
             git commit -m "data: weekly scrape $(date +%Y-W%V)"
             git push
           fi
+
+      - name: Deploy to VPS via rsync
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
+            docs/ \
+            ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:/var/www/qidian-heat-analysis/
