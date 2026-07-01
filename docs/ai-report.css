@@ -1,0 +1,62 @@
+/* ===============================================
+   起点天榜 · AI洞见 — AI report-specific styles
+   Extends style.css (must be loaded after it)
+   =============================================== */
+
+/* ── Hero Compact ── */
+.hero-compact {
+  padding: 32px 20px 28px;
+  text-align: center;
+  position: relative; z-index: 1;
+  background: radial-gradient(ellipse 80% 50% at 50% 40%, rgba(201,169,110,0.06) 0%, transparent 70%),
+              linear-gradient(180deg, #1a1610 0%, var(--ink) 100%);
+}
+.hero-compact .hero-title { font-size: 36px; letter-spacing: 4px; }
+.hero-compact .hero-sub { font-size: 14px; letter-spacing: 6px; }
+
+/* ── Report Body (rendered markdown) ── */
+.report-body {
+  font-size: 13px; line-height: 2;
+  color: var(--text);
+  padding: 4px 0;
+}
+.report-body h2 {
+  font-family: var(--font-serif); font-size: 16px; font-weight: 700;
+  color: var(--gold); margin: 20px 0 10px; letter-spacing: 2px;
+}
+.report-body h2::before {
+  content: '◆ '; color: var(--vermillion); font-size: 10px;
+  vertical-align: middle;
+}
+.report-body p {
+  margin-bottom: 10px; color: var(--text-dim);
+}
+.report-body ul {
+  list-style: none; padding-left: 0; margin: 8px 0 14px;
+}
+.report-body li {
+  padding: 4px 0 4px 16px; position: relative;
+  color: var(--text-dim); font-size: 12px;
+}
+.report-body li::before {
+  content: '—'; position: absolute; left: 0;
+  color: var(--gold-dim);
+}
+.report-body strong {
+  color: var(--gold-light); font-weight: 600;
+}
+.report-body .placeholder {
+  text-align: center; padding: 40px 20px;
+  color: var(--text-muted); font-style: italic;
+}
+
+/* ── Chart containers ── */
+.chart-sm { height: 320px; }
+.chart-md { height: 380px; }
+.chart-lg { height: 440px; }
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+  .hero-compact .hero-title { font-size: 26px; letter-spacing: 2px; }
+  .panel-row { grid-template-columns: 1fr; }
+}

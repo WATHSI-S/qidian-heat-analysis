@@ -25,6 +25,15 @@ jobs:
       - name: Run scraper
         run: python scraper/crawl.py
 
+      - name: Run text mining analysis
+        run: python scraper/analysis/pipeline.py --text-only
+
+      - name: Run LLM analysis
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scraper/analysis/pipeline.py --skip-text-mining
+
       - name: Copy data into docs for deployment
         run: |
           rm -rf docs/data/

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>起点天榜 · AI洞见</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="ai-report.css">
+</head>
+<body>
+
+<div class="noise-overlay"></div>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">起点 · 天榜</a>
+  <div class="nav-links">
+    <a href="index.html">总览</a>
+    <a href="analysis.html">深度分析</a>
+    <a href="trends.html">风向推荐</a>
+    <a href="ai-report.html" class="active">AI洞见</a>
+  </div>
+</nav>
+
+<header class="hero hero-compact">
+  <h1 class="hero-title">
+    <span class="title-brush">AI</span>
+    <span class="title-divider">·</span>
+    <span class="title-brush">洞见</span>
+  </h1>
+  <p class="hero-sub">大模型解析 · 文本挖掘</p>
+  <p class="hero-desc">DeepSeek 深度解析小说简介，提取流派标签、主角人设、金手指类型<br>结合 TF-IDF 文本挖掘，洞察网文创作风向</p>
+  <p class="hero-time" id="updateTime">— 等待天机降临 —</p>
+</header>
+
+<main class="board">
+
+  <!-- Overview Marks -->
+  <section class="marks-row" id="aiStats"></section>
+
+  <!-- Market Report -->
+  <section class="panel">
+    <h2 class="panel-title">本周AI市场报告</h2>
+    <div class="report-body" id="marketReport">
+      <p class="placeholder">报告生成中，请稍候…</p>
+    </div>
+  </section>
+
+  <!-- Row: Global Keywords + Genre Tags -->
+  <div class="panel-row">
+    <section class="panel">
+      <h2 class="panel-title">全站关键词权重</h2>
+      <div class="chart-container chart-md" id="chart-keywords"></div>
+    </section>
+    <section class="panel">
+      <h2 class="panel-title">流派标签分布</h2>
+      <div class="chart-container chart-md" id="chart-genretags"></div>
+    </section>
+  </div>
+
+  <!-- Category Keywords (Tabbed) -->
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">分类关键词特征</h2>
+      <nav class="rank-pills" id="catTabs"></nav>
+    </div>
+    <div class="chart-container chart-lg" id="chart-catkeywords"></div>
+  </section>
+
+  <!-- Row: Protagonist Archetypes + Golden Finger -->
+  <div class="panel-row">
+    <section class="panel">
+      <h2 class="panel-title">主角人设分布</h2>
+      <div class="chart-container chart-sm" id="chart-archetypes"></div>
+    </section>
+    <section class="panel">
+      <h2 class="panel-title">金手指类型</h2>
+      <div class="chart-container chart-sm" id="chart-goldenfinger"></div>
+    </section>
+  </div>
+
+  <!-- World Keywords Heatmap -->
+  <section class="panel">
+    <h2 class="panel-title">世界观关键词 — 分类对照</h2>
+    <div class="chart-container chart-lg" id="chart-worldmap"></div>
+  </section>
+
+  <!-- Genre Tag Co-occurrence -->
+  <section class="panel">
+    <h2 class="panel-title">流派标签共现关系</h2>
+    <div class="chart-container chart-lg" id="chart-cooccurrence"></div>
+  </section>
+
+</main>
+
+<footer class="endnote">
+  <p>AI 分析由 <a href="https://platform.deepseek.com/" target="_blank" rel="noopener">DeepSeek</a> 大模型驱动 · 文本挖掘基于 jieba + TF-IDF · 每周一早八时自动更新</p>
+</footer>
+
+<script defer src="https://cdn.jsdelivr.net/npm/echarts@6.0.0/dist/echarts.min.js"></script>
+<script defer src="ai-report.js"></script>
+</body>
+</html>

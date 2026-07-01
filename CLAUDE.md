@@ -4,7 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-A weekly web-scraping pipeline that collects public ranking data (~1000 entries/week) from Qidian (起点中文网) and visualizes it on a GitHub Pages static dashboard using ECharts. The scraper uses Playwright to bypass Qidian's `probe.js` anti-bot protection.
+A weekly web-scraping pipeline that collects public ranking data (~1000 entries/week) from Qidian (起点中文网) and visualizes it on an Alibaba Cloud VPS static dashboard using ECharts. The scraper uses Playwright to bypass Qidian's `probe.js` anti-bot protection.
+
+**Production URL:** http://47.102.40.95/ (阿里云 VPS, Ubuntu 24.04, nginx)
+**VPS SSH:** root@47.102.40.95 (密钥: `~/.ssh/qidian_vps_deploy`)
 
 ## Commands
 
@@ -24,6 +27,12 @@ python scraper/generate_sample.py [weeks]
 
 # Local preview (serve from repo root, then visit docs/index.html)
 python -m http.server 8080
+
+# Manually deploy docs/ to VPS
+rsync -avz --delete -e "ssh -i ~/.ssh/qidian_vps_deploy -o StrictHostKeyChecking=accept-new" docs/ root@47.102.40.95:/var/www/qidian-heat-analysis/
+
+# SSH into VPS
+ssh -i ~/.ssh/qidian_vps_deploy root@47.102.40.95
 ```
 
 ## Architecture
@@ -35,21 +44,24 @@ GitHub Actions (cron: weekly Monday 00:00 UTC)
   → scraper/crawl.py
   → Playwright headless Chromium + --disable-blink-features=AutomationControlled
   → data/YYYY-WW.json + data/index.json
-  → git commit & push → GitHub Pages auto-deploy from docs/
+  → cp -r data/ docs/data/
+  → git commit & push
+  → rsync docs/ → root@47.102.40.95:/var/www/qidian-heat-analysis/
+  → nginx serves from /var/www/qidian-heat-analysis/
 ```
 
 ### Scraper (`scraper/`)
 
 - **`crawl.py`** — CLI entry. `--dry-run` / `--max-per-rank N` control behavior.
-- **`rankings.py`** — Playwright async scraper. Uses `asyncio.run()` at the top-level sync entry `scrape_all_rankings()`. Launches one browser per crawl, creates a fresh context per ranking page. Primary selector: `li[data-rid]` (20 items/page, pagination via `?page=N`). Parsing: title from `h2 a`, author from `p.author a.name`, category from `p.author a:not(.name):not(.go-sub-type)`, status from `p.author span`, intro from `p.intro`.
-- **`storage.py`** — `save_weekly_snapshot()` writes `data/YYYY-WW.json`. `update_index()` rebuilds `data/index.json` scanning all week files for cumulative stats.
+- **`qidian_scraper/rankings.py`** — Playwright async scraper. `scrape_all_rankings()` is the main entry point (sync wrapper around async internals). One browser per crawl, fresh context per ranking page. Selector: `li[data-rid]` (20 items/page, pagination via `?page=N`). Parsing: title from `h2 a`, author from `p.author a.name`, category from `p.author a:not(.name):not(.go-sub-type)`, status from `p.author span`, intro from `p.intro`. Default: 200 books/rank × 8 rankings = 1600 books.
+- **`qidian_scraper/storage.py`** — `save_weekly_snapshot()` writes `data/YYYY-WW.json`. `update_index()` rebuilds `data/index.json` scanning all week files for cumulative stats.
 - **`generate_sample.py`** — Standalone fake-data generator for UI testing without hitting real Qidian.
 
 **Anti-bot**: Qidian returns a 202 JS probe page for bare `requests`. Playwright with `--disable-blink-features=AutomationControlled` flag is required. No login/cookies needed — all data is public.
 
 ### Frontend (`docs/`)
 
-Zero-build static site. CDN-loaded ECharts 5.5 + Google Fonts (Noto Serif SC / Noto Sans SC).
+Zero-build static site. ECharts 6.0 + Google Fonts (Noto Serif SC / Noto Sans SC) loaded from CDN with `defer` at end of `<body>` to avoid blocking render. Fonts from `fonts.googleapis.com`, ECharts from `cdn.jsdelivr.net`.
 
 Design aesthetic: **"天榜墨韵"** — dark ink-wash parchment theme with gold accents. CSS variables in `style.css` control the palette (`--ink`, `--parchment`, `--gold`, `--vermillion`).
 
@@ -90,14 +102,24 @@ Sections: overview cards, stacked-bar entry friendliness chart, momentum bars, d
 - `initChart(domId)` — disposes existing instance, creates SVG renderer, registers for resize
 - `darkAxis(name)` / `darkTooltip()` — shared dark-theme base config
 - `containLabel: true` on grids; spread order matters: `...darkAxis()` first, then overrides
-- Data path auto-detection: `../data/` on GitHub Pages, `./data/` locally
+- Data path auto-detection: JS checks `window.location.pathname.includes('/docs/')` to decide between `../data/` and `./data/`. On VPS and local, uses `./data/`.
 
 **Legacy files** in `docs/css/`, `docs/images/`, `docs/picture/`, `docs/scripts/` — unused, leftover from a prior Bootstrap-based theme.
 
 ### GitHub Actions (`.github/workflows/scrape.yml`)
 
 - Triggers: `cron 0 0 * * 1` (Monday UTC) + `workflow_dispatch`
-- Steps: checkout → Python 3.12 → pip install → `playwright install chromium` → `python scraper/crawl.py` → commit & push new data files
+- Steps: checkout → Python 3.12 → pip install → `playwright install chromium` → `python scraper/crawl.py` → `cp -r data/ docs/data/` → commit & push `data/` + `docs/data/` → `rsync docs/` to VPS
+- Secrets required: `VPS_HOST` (47.102.40.95), `VPS_USERNAME` (root), `VPS_SSH_PRIVATE_KEY` (ed25519 deploy key)
+- Line endings: CRLF breaks YAML parsing on GitHub; `.gitattributes` enforces `eol=lf` for all text files
+
+### VPS (`47.102.40.95`)
+
+- Ubuntu 24.04, nginx 1.24 serving from `/var/www/qidian-heat-analysis/`
+- `gzip` enabled for JSON/CSS/JS; static assets cached 7d, data files 1h
+- No domain; access via IP directly (port 80)
+- nginx config: `/etc/nginx/sites-available/default`, reload with `nginx -t && systemctl reload nginx`
+- Logs: `tail -f /var/log/nginx/access.log` / `error.log`
 
 ### Data format
 
@@ -123,7 +145,7 @@ Sections: overview cards, stacked-bar entry friendliness chart, momentum bars, d
 
 - Playwright required; plain `requests` gets 202 probe page
 - `word_count` not available on ranking list pages (removed from schema)
-- 8 rankings × 125 books = exactly 1000/week at default settings
+- 8 rankings × 200 books = up to 1600/week at default settings (CLI default: `--max-per-rank 200`)
 - Pages have 20 `li[data-rid]` items each; pagination uses `?page=N`
-- GitHub Pages serves `docs/`; data path adjusts accordingly
+- Data lives in `docs/data/` (workflow copies from repo root `data/`). VPS nginx serves directly from `/var/www/qidian-heat-analysis/`.
 - For UI redesigns, invoke the `frontend-design` skill (plugin: `frontend-design@claude-plugins-official`)
