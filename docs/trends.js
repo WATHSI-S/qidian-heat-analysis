@@ -168,11 +168,9 @@ function computeCategoryMomentum(currentBooks, previousBooks) {
     });
   });
 
-  // Normalize CMI to -100..100
-  const cmiValues = result.map(c => c.cmi);
-  const cmiAbsMax = Math.max(...cmiValues.map(Math.abs), 0.01);
+  // CMI is already bounded to [-1, 1] by tanh, scale directly to [-100, 100]
   result.forEach(c => {
-    c.cmiNorm = Math.round((c.cmi / cmiAbsMax) * 100);
+    c.cmiNorm = Math.round(c.cmi * 100);
   });
 
   return result.sort((a, b) => b.cmiNorm - a.cmiNorm);
@@ -584,15 +582,16 @@ function renderMomentumChart(catMomentum) {
   const chart = initChart('chart-momentum');
   if (!chart) return;
 
-  const data = catMomentum.slice(0, 15);
-  const names = data.map(d => d.category);
-  const values = data.map(d => d.cmiNorm);
+  // Sort ascending by cmiNorm for display: lowest at index 0 (bottom with inverse:true)
+  const displayData = [...catMomentum].sort((a, b) => a.cmiNorm - b.cmiNorm).slice(0, 15);
+  const names = displayData.map(d => d.category);
+  const values = displayData.map(d => d.cmiNorm);
 
   chart.setOption({
     tooltip: {
       ...darkTooltip(), trigger: 'axis', axisPointer: { type: 'shadow' },
       formatter: p => {
-        const d = data[p[0].dataIndex];
+        const d = displayData[p[0].dataIndex];
         return `<div style="font-size:13px;font-weight:700">${esc(d.category)}</div>`
           + `<div>动量指数: <b style="color:${d.cmiNorm >= 0 ? '#2ecc71' : '#e74c3c'}">${d.cmiNorm > 0 ? '+' : ''}${d.cmiNorm}</b></div>`
           + `<div>热度变化: <b>${d.heatDelta > 0 ? '+' : ''}${d.heatDelta}%</b></div>`
@@ -602,13 +601,13 @@ function renderMomentumChart(catMomentum) {
     grid: { left: 6, right: 45, top: 8, bottom: 6, containLabel: true },
     xAxis: { type: 'value', ...darkAxis('动量指数'), min: -100, max: 100 },
     yAxis: {
-      type: 'category', data: names.reverse(), inverse: true,
+      type: 'category', data: names, inverse: true,
       axisLabel: { color: '#c0b8a8', fontSize: 11 },
       axisLine: { show: false }, axisTick: { show: false },
     },
     series: [{
       type: 'bar',
-      data: values.reverse().map(v => ({
+      data: values.map(v => ({
         value: v,
         itemStyle: {
           color: v >= 0
