@@ -4,6 +4,7 @@ Qidian ranking page scraper — uses Playwright to bypass JS anti-bot probe.
 
 import asyncio
 import logging
+import random
 from typing import Optional
 
 from bs4 import BeautifulSoup, Tag
@@ -170,7 +171,7 @@ async def _scrape_rank_page(browser: Browser, rank_type: str, max_books: int = M
             for page_num in range(1, 10):  # max 10 pages
                 if page_num > 1:
                     await page.goto(f"{url}?page={page_num}", wait_until="domcontentloaded", timeout=PAGE_TIMEOUT)
-                    await page.wait_for_timeout(2000)
+                    await page.wait_for_timeout(2000 + random.randint(0, 2000))
                     html = await page.content()
                     soup = BeautifulSoup(html, "lxml")
 
@@ -251,8 +252,13 @@ def scrape_all_rankings(max_per_rank: int = MAX_BOOKS_PER_RANK) -> list[dict]:
                 args=["--disable-blink-features=AutomationControlled", "--no-sandbox"],
             )
             all_books = []
+            rank_types = list(RANK_PAGES.keys())
             try:
-                for rank_type in RANK_PAGES:
+                for i, rank_type in enumerate(rank_types):
+                    if i > 0:
+                        delay = random.uniform(4, 10)
+                        logger.info("Waiting %.1fs before next ranking...", delay)
+                        await asyncio.sleep(delay)
                     try:
                         books = await _scrape_rank_page(browser, rank_type, max_books=max_per_rank)
                         all_books.extend(books)
