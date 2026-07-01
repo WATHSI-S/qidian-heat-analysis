@@ -120,64 +120,101 @@ def _parse_book_item(el: Tag, rank_type: str) -> Optional[dict]:
 
 
 async def _scrape_rank_page(browser: Browser, rank_type: str, max_books: int = MAX_BOOKS_PER_RANK) -> list[dict]:
-    """Scrape a single ranking page, including pagination."""
+    """Scrape a single ranking page, including pagination. Retries on anti-bot probe."""
     rank_path = RANK_PAGES[rank_type]
     url = BASE_URL + rank_path
     logger.info("Scraping %s: %s", rank_type, url)
 
-    page = await _new_page(browser)
-    results = []
+    import asyncio as aio
 
-    try:
-        # Navigate and wait for the real content to appear after anti-bot probe
-        await page.goto(url, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT)
+    MAX_RETRIES = 3
+    for attempt in range(MAX_RETRIES):
+        page = await _new_page(browser)
+        results = []
 
-        # Wait a bit for any JS probe to finish and real content to render
-        await page.wait_for_timeout(3000)
-
-        # Wait for at least some book entries to appear
         try:
-            await page.wait_for_selector("li[data-rid], div.rank-list li, ul.rank-list li, div.rank-item", timeout=15000)
-        except Exception:
-            logger.warning("Rank list selector not found, trying fallback...")
+            await page.goto(url, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT)
 
-        html = await page.content()
-        soup = BeautifulSoup(html, "lxml")
-
-        # Try selectors to find book items
-        book_selector = _find_working_selector(soup)
-
-        for page_num in range(1, 10):  # max 10 pages
-            if page_num > 1:
-                await page.goto(f"{url}?page={page_num}", wait_until="domcontentloaded", timeout=PAGE_TIMEOUT)
-                await page.wait_for_timeout(2000)
+            # Wait for real book list items to render (anti-bot probe may delay this)
+            try:
+                await page.wait_for_selector("li[data-rid]", timeout=20000)
+            except Exception:
+                # Check if we got the anti-bot probe page
                 html = await page.content()
-                soup = BeautifulSoup(html, "lxml")
+                if "probe" in html.lower():
+                    logger.warning("%s: anti-bot probe page detected, retry %d/%d",
+                                   rank_type, attempt + 1, MAX_RETRIES)
+                    await page.close()
+                    await aio.sleep(2 * (attempt + 1))
+                    continue
+                logger.warning("%s: selector wait timed out, trying fallback...", rank_type)
 
-            items = soup.select(book_selector)
-            if not items:
-                break
+            html = await page.content()
+            soup = BeautifulSoup(html, "lxml")
+            book_selector = _find_working_selector(soup)
 
-            for item in items:
-                if len(results) >= max_books:
+            # If fallback-only matched and no real books found, likely probe
+            if book_selector == "li":
+                sample = soup.select("li")
+                has_books = any(
+                    item.select_one("h2 a") or item.select_one("p.author")
+                    for item in sample[:20]
+                )
+                if not has_books and attempt < MAX_RETRIES - 1:
+                    logger.warning("%s: page has no book items, probe likely, retry %d/%d",
+                                   rank_type, attempt + 1, MAX_RETRIES)
+                    await page.close()
+                    await aio.sleep(2 * (attempt + 1))
+                    continue
+
+            for page_num in range(1, 10):  # max 10 pages
+                if page_num > 1:
+                    await page.goto(f"{url}?page={page_num}", wait_until="domcontentloaded", timeout=PAGE_TIMEOUT)
+                    await page.wait_for_timeout(2000)
+                    html = await page.content()
+                    soup = BeautifulSoup(html, "lxml")
+
+                items = soup.select(book_selector)
+                if not items:
                     break
-                book = _parse_book_item(item, rank_type)
-                if book:
-                    book["rank"] = len(results) + 1
-                    results.append(book)
 
-            logger.info("  Page %d: %d books (total: %d)", page_num, len(items), len(results))
+                for item in items:
+                    if len(results) >= max_books:
+                        break
+                    book = _parse_book_item(item, rank_type)
+                    if book:
+                        book["rank"] = len(results) + 1
+                        results.append(book)
 
-            if len(items) < 20 or len(results) >= max_books:
-                break
+                logger.info("  Page %d: %d books (total: %d)", page_num, len(items), len(results))
 
-    except Exception as e:
-        logger.error("Error scraping %s: %s", rank_type, e)
-    finally:
-        await page.close()
+                if len(items) < 20 or len(results) >= max_books:
+                    break
 
-    logger.info("Scraped %d books from %s ranking", len(results), rank_type)
-    return results
+            # Success — got real data
+            if results:
+                logger.info("Scraped %d books from %s ranking", len(results), rank_type)
+                return results
+
+            # No results but no probe detected — maybe empty page
+            if attempt < MAX_RETRIES - 1:
+                logger.warning("%s: 0 results without probe detection, retry %d/%d",
+                               rank_type, attempt + 1, MAX_RETRIES)
+            else:
+                logger.warning("Scraped %d books from %s ranking (all attempts exhausted)",
+                               len(results), rank_type)
+
+        except Exception as e:
+            logger.error("Error scraping %s (attempt %d/%d): %s",
+                         rank_type, attempt + 1, MAX_RETRIES, e)
+        finally:
+            await page.close()
+
+        if attempt < MAX_RETRIES - 1:
+            await aio.sleep(2 * (attempt + 1))
+
+    logger.error("Failed to scrape %s after %d retries, returning 0 results", rank_type, MAX_RETRIES)
+    return []
 
 
 def _find_working_selector(soup: BeautifulSoup) -> str:
