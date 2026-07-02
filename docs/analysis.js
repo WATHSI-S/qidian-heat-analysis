@@ -528,11 +528,19 @@ function renderAssociationSankey(assocData) {
     });
   });
 
-  const links = rules.map(r => ({
-    source: nodeMap[r.antecedent],
-    target: nodeMap[r.consequent],
-    value: Math.round(r.lift * 100) / 100,
-  }));
+  // Deduplicate bidirectional pairs to avoid cycles (sankey requires DAG)
+  const links = [];
+  rules.forEach(r => {
+    const pair = [r.antecedent, r.consequent].sort().join('|');
+    if (!seen.has(pair)) {
+      seen.add(pair);
+      links.push({
+        source: nodeMap[r.antecedent],
+        target: nodeMap[r.consequent],
+        value: Math.round(r.lift * 100) / 100,
+      });
+    }
+  });
 
   chart.setOption({
     tooltip: {
@@ -547,7 +555,6 @@ function renderAssociationSankey(assocData) {
     },
     series: [{
       type: 'sankey',
-      layout: 'none',
       emphasis: { focus: 'adjacency' },
       nodeAlign: 'left',
       data: nodes,
@@ -585,9 +592,9 @@ function renderClusterScatter(clusterData) {
       author: b.author,
       category: b.category,
     })),
-    symbolSize: 8,
-    itemStyle: { color: CLUSTER_COLORS[idx % CLUSTER_COLORS.length], opacity: 0.8 },
-    emphasis: { scale: 1.5 },
+    symbolSize: 10,
+    itemStyle: { color: CLUSTER_COLORS[idx % CLUSTER_COLORS.length], opacity: 0.85 },
+    emphasis: { scale: 2, focus: 'series' },
   }));
 
   const pcaVar = clusterData.pca_variance || [];
@@ -683,8 +690,8 @@ async function main() {
     renderLongevityChart(appearances);
     renderCoverageChart(heatScores);
     renderCategoryGrid(catRankings);
-    renderAssociationSankey(assoc);
-    renderClusterScatter(clusters);
+    try { renderAssociationSankey(assoc); } catch (e) { console.error('Sankey 渲染失败:', e); }
+    try { renderClusterScatter(clusters); } catch (e) { console.error('聚类图渲染失败:', e); }
 
   } catch (err) {
     console.error('分析启动失败:', err);
