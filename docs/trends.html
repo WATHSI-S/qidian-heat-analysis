@@ -67,6 +67,18 @@
     <div class="chart-container chart-lg" id="chart-momentum"></div>
   </section>
 
+  <!-- Forecast -->
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">品类热度预测 — Holt-Winters 时序预测</h2>
+      <span style="font-size:11px;color:var(--text-muted)">Holt 双指数平滑，拟合趋势线 + 预测 1-2 周 + 95% 置信带</span>
+    </div>
+    <div class="section-intro">
+      基于历史周度热度数据进行 Holt-Winters 指数平滑预测。实线为历史数据，虚线为预测值，半透明带为 95% 置信区间。仅展示有足够数据点的品类。
+    </div>
+    <div class="chart-container chart-lg" id="chart-forecast"></div>
+  </section>
+
   <!-- Market Gap Analysis -->
   <div class="panel-row-charts">
     <section class="panel">

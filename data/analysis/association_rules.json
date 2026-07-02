@@ -1,0 +1,77 @@
+{
+  "rules": [
+    {
+      "antecedent": "recom",
+      "consequent": "yuepiao",
+      "support": 0.176,
+      "confidence": 0.6833,
+      "lift": 2.6536
+    },
+    {
+      "antecedent": "yuepiao",
+      "consequent": "recom",
+      "support": 0.176,
+      "confidence": 0.6833,
+      "lift": 2.6536
+    },
+    {
+      "antecedent": "hotsales",
+      "consequent": "yuepiao",
+      "support": 0.1631,
+      "confidence": 0.6333,
+      "lift": 2.4594
+    },
+    {
+      "antecedent": "yuepiao",
+      "consequent": "hotsales",
+      "support": 0.1631,
+      "confidence": 0.6333,
+      "lift": 2.4594
+    },
+    {
+      "antecedent": "newfans",
+      "consequent": "hotsales",
+      "support": 0.1516,
+      "confidence": 0.5889,
+      "lift": 2.2869
+    },
+    {
+      "antecedent": "hotsales",
+      "consequent": "newfans",
+      "support": 0.1516,
+      "confidence": 0.5889,
+      "lift": 2.2869
+    },
+    {
+      "antecedent": "hotsales",
+      "consequent": "recom",
+      "support": 0.1474,
+      "confidence": 0.5722,
+      "lift": 2.2221
+    },
+    {
+      "antecedent": "recom",
+      "consequent": "hotsales",
+      "support": 0.1474,
+      "confidence": 0.5722,
+      "lift": 2.2221
+    },
+    {
+      "antecedent": "newfans",
+      "consequent": "yuepiao",
+      "support": 0.1288,
+      "confidence": 0.5,
+      "lift": 1.9417
+    },
+    {
+      "antecedent": "yuepiao",
+      "consequent": "newfans",
+      "support": 0.1288,
+      "confidence": 0.5,
+      "lift": 1.9417
+    }
+  ],
+  "n_transactions": 699,
+  "week": "2026-W27",
+  "updated_at": "2026-07-02T16:00:48.196305"
+}

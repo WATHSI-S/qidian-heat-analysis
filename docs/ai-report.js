@@ -68,7 +68,7 @@ const CHART_COLORS = ['#c9a96e', '#27ae60', '#5b8db8', '#c0392b', '#8b7355', '#6
 
 async function loadAnalysisData() {
   const base = DATA_BASE + 'analysis/';
-  const files = ['keywords.json', 'category_keywords.json', 'genre_tags.json', 'llm_insights.json', 'weekly_report.md'];
+  const files = ['keywords.json', 'category_keywords.json', 'genre_tags.json', 'llm_insights.json', 'weekly_report.md', 'agent_insights.json', 'agent_report.md'];
   const results = {};
 
   for (const file of files) {
@@ -86,6 +86,9 @@ async function loadAnalysisData() {
 
   if (results.llm_insights && results.llm_insights.error) {
     results.llm_insights = null;
+  }
+  if (results.agent_insights && results.agent_insights.error) {
+    results.agent_insights = null;
   }
 
   return results;
@@ -113,39 +116,198 @@ function renderOverview(data) {
   ).join('');
 }
 
-// ── Section: Market Report (Markdown → HTML) ──
+// ── Section: Agent Report (Markdown → HTML, falls back to weekly_report) ──
 
-function renderMarketReport(md) {
-  const container = document.getElementById('marketReport');
+function renderAgentReport(data) {
+  const container = document.getElementById('agentReport');
   if (!container) return;
 
+  // Prefer Agent report, fall back to LLM report
+  const md = data.agent_report || data.weekly_report;
+
   if (!md) {
-    container.innerHTML = '<p class="placeholder">AI 市场报告暂未生成，请等待下次数据更新。</p>';
+    container.innerHTML = '<p class="placeholder">AI 报告暂未生成，请等待下次数据更新。</p>';
     return;
   }
 
-  // Simple markdown → HTML converter for the expected format
   let html = md
-    // Headings
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    // Bold
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // Unordered list items
     .replace(/^- (.+)$/gm, '<li>$1</li>')
-    // Wrap consecutive <li> in <ul>
     .replace(/((?:<li>.*<\/li>\s*)+)/g, '<ul>$1</ul>')
-    // Paragraphs (double newlines)
     .replace(/\n\n/g, '</p><p>')
-    // Single newlines within paragraphs → space
     .replace(/\n/g, ' ');
 
   html = '<p>' + html + '</p>';
-  // Clean up empty paragraphs
   html = html.replace(/<p>\s*<\/p>/g, '');
   html = html.replace(/<p>\s*<h2>/g, '<h2>');
   html = html.replace(/<\/h2>\s*<\/p>/g, '</h2>');
 
   container.innerHTML = html;
+}
+
+// ── Chat Widget ──
+
+let faqDB = [];
+let faqVectors = [];
+
+// Simple tokenizer: unigram + bigram for Chinese text
+function tokenize(text) {
+  const cleaned = text.replace(/[^一-鿿\w]/g, ' ');
+  const chars = cleaned.split(/\s+/).filter(w => w.length >= 1);
+  const tokens = [];
+  chars.forEach(c => {
+    if (c.length >= 2) tokens.push(c);
+    for (let i = 0; i < c.length - 1; i++) {
+      tokens.push(c.substring(i, i + 2));
+    }
+  });
+  return tokens;
+}
+
+// Build TF-IDF-like vectors from FAQ data
+function buildFAQIndex(faqItems) {
+  const allTokens = new Set();
+  faqItems.forEach(item => {
+    const tokens = tokenize(item.q + ' ' + (item.keywords || []).join(' '));
+    item._tokens = tokens;
+    tokens.forEach(t => allTokens.add(t));
+  });
+
+  const tokenList = Array.from(allTokens);
+  const tokenIdx = {};
+  tokenList.forEach((t, i) => { tokenIdx[t] = i; });
+
+  faqVectors = faqItems.map(item => {
+    const vec = new Array(tokenList.length).fill(0);
+    const tf = {};
+    item._tokens.forEach(t => { tf[t] = (tf[t] || 0) + 1; });
+    const maxFreq = Math.max(...Object.values(tf), 1);
+    // Simple TF-IDF approximation
+    Object.entries(tf).forEach(([t, freq]) => {
+      const idx = tokenIdx[t];
+      if (idx !== undefined) {
+        const tfNorm = freq / maxFreq;
+        const docsWithTerm = faqItems.filter(f => f._tokens.includes(t)).length;
+        const idf = Math.log(faqItems.length / (docsWithTerm + 1)) + 1;
+        vec[idx] = tfNorm * idf;
+      }
+    });
+    return vec;
+  });
+
+  faqDB = faqItems;
+}
+
+function cosineSimilarity(a, b) {
+  let dot = 0, magA = 0, magB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    magA += a[i] * a[i];
+    magB += b[i] * b[i];
+  }
+  if (magA === 0 || magB === 0) return 0;
+  return dot / (Math.sqrt(magA) * Math.sqrt(magB));
+}
+
+function matchFAQ(query) {
+  if (faqDB.length === 0) return null;
+
+  const queryTokens = tokenize(query);
+  const queryVec = new Array(faqVectors[0].length).fill(0);
+  const tf = {};
+  queryTokens.forEach(t => { tf[t] = (tf[t] || 0) + 1; });
+  const maxFreq = Math.max(...Object.values(tf), 1);
+  const tokenIdxMap = {};
+
+  // Rebuild token index from the first FAQ vector
+  // We need the original token list... let me use a different approach
+  // Instead, use simple Jaccard-like token overlap matching
+  let bestMatch = null;
+  let bestScore = 0;
+
+  faqDB.forEach(item => {
+    const itemTokens = new Set(item._tokens);
+    const queryTokenSet = new Set(queryTokens);
+    let overlap = 0;
+    queryTokenSet.forEach(t => {
+      if (itemTokens.has(t)) overlap++;
+    });
+    const union = new Set([...itemTokens, ...queryTokenSet]).size;
+    const score = union > 0 ? overlap / Math.sqrt(union) : 0;
+    // Bonus for keyword match
+    const kwBonus = (item.keywords || []).filter(k => query.includes(k)).length * 0.15;
+    const total = score + kwBonus;
+    if (total > bestScore) {
+      bestScore = total;
+      bestMatch = item;
+    }
+  });
+
+  if (bestScore < 0.06) return null;
+  return bestMatch;
+}
+
+function addChatMessage(text, type) {
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + (type === 'user' ? 'chat-msg-user' : 'chat-msg-agent');
+  div.innerHTML = '<div class="chat-msg-content">' + esc(text) + '</div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function initChatWidget(data) {
+  const agentData = data.agent_insights;
+  let faqItems = [];
+
+  if (agentData && agentData.faq && agentData.faq.length > 0) {
+    faqItems = agentData.faq;
+  } else if (data.llm_insights && data.llm_insights.aggregations) {
+    // Generate basic FAQs from LLM data
+    const aggs = data.llm_insights.aggregations;
+    if (aggs.top_genre_tags && aggs.top_genre_tags.length > 0) {
+      const topTags = aggs.top_genre_tags.slice(0, 5).map(t => t.tag).join('、');
+      faqItems.push({
+        q: '当前最热门的流派标签有哪些？',
+        a: `根据分析，目前最热门的流派标签包括：${topTags}。这些标签反映了当前读者的阅读偏好。`,
+        keywords: ['热门', '流派', '标签'],
+      });
+    }
+    faqItems.push({
+      q: '网文创作中如何选择题材？',
+      a: '建议综合考虑读者需求（月票/畅销榜活跃度）、市场竞争格局（头部集中度）、以及自身擅长的领域来选择题材。可以关注签约新书榜中表现较好的品类作为切入点。',
+      keywords: ['创作', '题材', '选择'],
+    });
+  }
+
+  buildFAQIndex(faqItems);
+
+  const sendBtn = document.getElementById('chatSend');
+  const input = document.getElementById('chatInput');
+  if (!sendBtn || !input) return;
+
+  const handleSend = () => {
+    const query = input.value.trim();
+    if (!query) return;
+
+    addChatMessage(query, 'user');
+    input.value = '';
+
+    const matched = matchFAQ(query);
+    if (matched) {
+      addChatMessage(matched.a, 'agent');
+    } else {
+      addChatMessage('抱歉，我暂时没有找到与您问题直接相关的数据。建议您查看「深度分析」页的排名异动表和热度总榜，或「风向推荐」页的品类分析和写作建议，那里有更详细的定量数据。', 'agent');
+    }
+  };
+
+  sendBtn.addEventListener('click', handleSend);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleSend();
+  });
 }
 
 // ── Section: Global Keywords (horizontal bar) ──
@@ -513,7 +675,7 @@ async function main() {
     }
 
     renderOverview(data);
-    renderMarketReport(data.weekly_report);
+    renderAgentReport(data);
     renderKeywordChart(data);
     renderGenreTagChart(data);
     renderCategoryKeywords(data);
@@ -521,6 +683,7 @@ async function main() {
     renderGoldenFingerChart(data);
     renderWorldKeywordHeatmap(data);
     renderCooccurrenceChart(data);
+    initChatWidget(data);
 
   } catch (err) {
     console.error('AI洞见启动失败:', err);

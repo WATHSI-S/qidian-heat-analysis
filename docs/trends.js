@@ -85,6 +85,11 @@ async function loadAllWeeks(index) {
   return snaps;
 }
 
+async function loadForecastData() {
+  try { return await fetchJSON(DATA_BASE + 'analysis/forecast.json'); }
+  catch { return null; }
+}
+
 // ═══════════════════════════════════════════════
 // ALGORITHM 1: Heat Score (same as analysis.js)
 // ═══════════════════════════════════════════════
@@ -692,6 +697,142 @@ function renderMarketChart(marketGaps) {
   }, true);
 }
 
+// ── Forecast Chart ──
+function renderForecastChart(forecastData) {
+  const chart = initChart('chart-forecast');
+  if (!chart) return;
+
+  if (!forecastData || forecastData.error || !forecastData.categories) {
+    chart.setOption({
+      title: { text: '预测数据暂不可用', left: 'center', top: 'center',
+        textStyle: { color: DARK_TEXT, fontSize: 13 } },
+    });
+    return;
+  }
+
+  const cats = forecastData.categories;
+  const catNames = Object.keys(cats);
+  if (catNames.length === 0) {
+    chart.setOption({
+      title: { text: '数据不足，暂无预测', left: 'center', top: 'center',
+        textStyle: { color: DARK_TEXT, fontSize: 13 } },
+    });
+    return;
+  }
+
+  const weekLabels = forecastData.week_labels || [];
+  const lastWeekNum = weekLabels.length > 0
+    ? (parseInt(weekLabels[weekLabels.length - 1].split('-W')[1]) || 0)
+    : 0;
+
+  // Build series: one line per category (limited to top 8 by latest heat)
+  const catList = catNames.map(name => {
+    const c = cats[name];
+    const lastHeat = c.history && c.history.length > 0 ? c.history[c.history.length - 1].heat : 0;
+    return { name, lastHeat, ...c };
+  });
+  catList.sort((a, b) => b.lastHeat - a.lastHeat);
+  const topCats = catList.slice(0, 8);
+
+  const colors = ['#e8c878', '#5b8db8', '#27ae60', '#e67e22', '#e74c3c', '#8e44ad', '#1abc9c', '#e91e63'];
+
+  const series = [];
+  topCats.forEach((cat, idx) => {
+    const lineColor = colors[idx];
+    const history = cat.history || [];
+    const trend = cat.trend || [];
+    const histWeeks = history.map(h => h.week);
+
+    // History as solid line
+    series.push({
+      name: cat.name,
+      type: 'line',
+      data: history.map(h => h.heat),
+      xAxisIndex: 0,
+      symbol: 'circle',
+      symbolSize: 5,
+      lineStyle: { color: lineColor, width: 2 },
+      itemStyle: { color: lineColor },
+      emphasis: { focus: 'series' },
+    });
+
+    // Trend fitted line (dashed)
+    if (trend.length > 0 && trend.every(v => v !== null)) {
+      series.push({
+        name: cat.name + '(趋势)',
+        type: 'line',
+        data: [...Array(histWeeks.length - trend.length).fill(null), ...trend],
+        xAxisIndex: 0,
+        symbol: 'none',
+        lineStyle: { color: lineColor, width: 1.5, type: 'dashed', opacity: 0.6 },
+        itemStyle: { color: lineColor, opacity: 0.6 },
+        silent: true,
+      });
+    }
+
+    // Forecast point(s)
+    const fcVals = [cat.forecast, cat.forecast_w2].filter(v => v != null);
+    if (fcVals.length > 0) {
+      const fcLabels = fcVals.length === 1 ? ['预测'] : ['预测+1', '预测+2'];
+      series.push({
+        name: cat.name + '(预测)',
+        type: 'line',
+        data: [...Array(histWeeks.length).fill(null), ...fcVals],
+        xAxisIndex: 0,
+        symbol: 'diamond',
+        symbolSize: 8,
+        lineStyle: { color: lineColor, width: 2, type: 'dotted' },
+        itemStyle: { color: lineColor, borderColor: '#fff', borderWidth: 1 },
+        silent: true,
+      });
+
+      // Confidence interval band
+      if (cat.ci_lower != null && cat.ci_upper != null) {
+        series.push({
+          name: cat.name + '(置信带)',
+          type: 'line',
+          data: [
+            ...[...Array(histWeeks.length - 1).fill(null)],
+            [cat.ci_lower, cat.ci_upper],
+            cat.forecast_w2 != null && cat.ci_lower != null ? [Math.max(0, cat.ci_lower * 0.7), cat.ci_upper * 1.1] : null,
+          ].filter(v => v !== null),
+          xAxisIndex: 0,
+          symbol: 'none',
+          lineStyle: { color: lineColor, width: 0, opacity: 0 },
+          areaStyle: { color: lineColor, opacity: 0.1 },
+          silent: true,
+        });
+      }
+    }
+  });
+
+  chart.setOption({
+    tooltip: {
+      ...darkTooltip(),
+      trigger: 'axis',
+    },
+    legend: {
+      type: 'scroll',
+      bottom: 0,
+      textStyle: { color: DARK_TEXT, fontSize: 10 },
+      data: topCats.map(c => c.name),
+    },
+    grid: { left: 10, right: 30, top: 10, bottom: 40, containLabel: true },
+    xAxis: {
+      type: 'category',
+      data: [...weekLabels, '预测+1周', '预测+2周'],
+      axisLabel: { color: DARK_TEXT, fontSize: 10, rotate: 20 },
+      axisLine: { lineStyle: { color: DARK_AXIS } },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      ...darkAxis('热度值'),
+    },
+    series,
+  }, true);
+}
+
 // ── Market Gap Table ──
 function renderMarketTable(marketGaps) {
   const tbody = document.querySelector('#gapTable tbody');
@@ -860,6 +1001,11 @@ async function main() {
     renderMarketTable(marketGaps);
     renderRecommendations(marketGaps);
     renderTrendDirection(catMomentum, entryScores);
+
+    // Load and render forecast (data mining module 3, non-blocking)
+    loadForecastData().then(data => {
+      if (data) renderForecastChart(data);
+    }).catch(() => {});
 
   } catch (err) {
     console.error('风向分析启动失败:', err);

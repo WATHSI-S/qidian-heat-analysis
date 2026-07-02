@@ -1,0 +1,267 @@
+{
+  "anomalies": [
+    {
+      "title": "每天一门功法圆满",
+      "author": "天天吃蔬菜",
+      "category": "玄幻",
+      "rank_type": "hotsales",
+      "prev_rank": 42,
+      "cur_rank": 161,
+      "z_score": -3.77,
+      "direction": "down"
+    },
+    {
+      "title": "三国：我父玄德，是关中王来了",
+      "author": "堂燕归来",
+      "category": "历史",
+      "rank_type": "signnewbook",
+      "prev_rank": 151,
+      "cur_rank": 21,
+      "z_score": 3.68,
+      "direction": "up"
+    },
+    {
+      "title": "西游：拦路人！",
+      "author": "九月病句",
+      "category": "仙侠",
+      "rank_type": "yuepiao",
+      "prev_rank": 166,
+      "cur_rank": 64,
+      "z_score": 3.62,
+      "direction": "up"
+    },
+    {
+      "title": "我的职业太有个性",
+      "author": "团又圆",
+      "category": "玄幻",
+      "rank_type": "hotsales",
+      "prev_rank": 173,
+      "cur_rank": 71,
+      "z_score": 3.47,
+      "direction": "up"
+    },
+    {
+      "title": "我，财神！",
+      "author": "人间一流",
+      "category": "都市",
+      "rank_type": "signnewbook",
+      "prev_rank": 152,
+      "cur_rank": 42,
+      "z_score": 3.37,
+      "direction": "up"
+    },
+    {
+      "title": "人气至上，我扮演超级天才",
+      "author": "桂月熬糖",
+      "category": "轻小说",
+      "rank_type": "newfans",
+      "prev_rank": 3,
+      "cur_rank": 135,
+      "z_score": -3.26,
+      "direction": "down"
+    },
+    {
+      "title": "天下无敌！",
+      "author": "乘风御剑",
+      "category": "玄幻",
+      "rank_type": "newfans",
+      "prev_rank": 34,
+      "cur_rank": 136,
+      "z_score": -3.22,
+      "direction": "down"
+    },
+    {
+      "title": "战锤：我也要坐黄金王座吗？",
+      "author": "犹格在码字",
+      "category": "轻小说",
+      "rank_type": "newfans",
+      "prev_rank": 159,
+      "cur_rank": 17,
+      "z_score": 3.18,
+      "direction": "up"
+    },
+    {
+      "title": "回到县城，我靠发薪财富自由",
+      "author": "肥狸骑士",
+      "category": "都市",
+      "rank_type": "signnewbook",
+      "prev_rank": 140,
+      "cur_rank": 38,
+      "z_score": 3.13,
+      "direction": "up"
+    },
+    {
+      "title": "人在魔门，我的功法在搞宫斗！",
+      "author": "咫尺云深",
+      "category": "玄幻",
+      "rank_type": "recom",
+      "prev_rank": 47,
+      "cur_rank": 145,
+      "z_score": -3.08,
+      "direction": "down"
+    },
+    {
+      "title": "这个顶流没读过大学",
+      "author": "银博士",
+      "category": "都市",
+      "rank_type": "signnewbook",
+      "prev_rank": 127,
+      "cur_rank": 28,
+      "z_score": 3.04,
+      "direction": "up"
+    },
+    {
+      "title": "赤心巡天",
+      "author": "情何以甚",
+      "category": "仙侠",
+      "rank_type": "yuepiao",
+      "prev_rank": 18,
+      "cur_rank": 101,
+      "z_score": -3.03,
+      "direction": "down"
+    },
+    {
+      "title": "原来我才是妖魔啊",
+      "author": "极品豆芽",
+      "category": "仙侠",
+      "rank_type": "hotsales",
+      "prev_rank": 166,
+      "cur_rank": 84,
+      "z_score": 2.9,
+      "direction": "up"
+    },
+    {
+      "title": "从衔尾蛇石碑开始超凡",
+      "author": "深红月",
+      "category": "玄幻",
+      "rank_type": "newfans",
+      "prev_rank": 71,
+      "cur_rank": 163,
+      "z_score": -2.89,
+      "direction": "down"
+    },
+    {
+      "title": "全职法师",
+      "author": "乱",
+      "category": "玄幻",
+      "rank_type": "recom",
+      "prev_rank": 124,
+      "cur_rank": 40,
+      "z_score": 2.88,
+      "direction": "up"
+    },
+    {
+      "title": "佣兵战争从俄乌开始",
+      "author": "应樱盈",
+      "category": "都市",
+      "rank_type": "signnewbook",
+      "prev_rank": 137,
+      "cur_rank": 44,
+      "z_score": 2.86,
+      "direction": "up"
+    },
+    {
+      "title": "我的女友来自1949",
+      "author": "刘老实",
+      "category": "都市",
+      "rank_type": "newfans",
+      "prev_rank": 10,
+      "cur_rank": 103,
+      "z_score": -2.77,
+      "direction": "down"
+    },
+    {
+      "title": "从黄皮子开始成神",
+      "author": "OL小小怪",
+      "category": "仙侠",
+      "rank_type": "signnewbook",
+      "prev_rank": 163,
+      "cur_rank": 85,
+      "z_score": 2.76,
+      "direction": "up"
+    },
+    {
+      "title": "1985：开局大雪封门",
+      "author": "别惹大鹅",
+      "category": "都市",
+      "rank_type": "hotsales",
+      "prev_rank": 37,
+      "cur_rank": 129,
+      "z_score": -2.74,
+      "direction": "down"
+    },
+    {
+      "title": "谁把遗言落这了？",
+      "author": "南山予鹿",
+      "category": "奇幻",
+      "rank_type": "hotsales",
+      "prev_rank": 180,
+      "cur_rank": 96,
+      "z_score": 2.74,
+      "direction": "up"
+    },
+    {
+      "title": "1985：开局大雪封门",
+      "author": "别惹大鹅",
+      "category": "都市",
+      "rank_type": "newfans",
+      "prev_rank": 43,
+      "cur_rank": 134,
+      "z_score": -2.71,
+      "direction": "down"
+    },
+    {
+      "title": "这个地下城长蘑菇了",
+      "author": "生吃菌子",
+      "category": "奇幻",
+      "rank_type": "yuepiao",
+      "prev_rank": 59,
+      "cur_rank": 149,
+      "z_score": -2.67,
+      "direction": "down"
+    },
+    {
+      "title": "仙业",
+      "author": "鹓扶君",
+      "category": "仙侠",
+      "rank_type": "recom",
+      "prev_rank": 126,
+      "cur_rank": 51,
+      "z_score": 2.65,
+      "direction": "up"
+    },
+    {
+      "title": "人在副本，永不迷路",
+      "author": "十具子",
+      "category": "科幻",
+      "rank_type": "signnewbook",
+      "prev_rank": 121,
+      "cur_rank": 47,
+      "z_score": 2.6,
+      "direction": "up"
+    },
+    {
+      "title": "1987我的年代",
+      "author": "三月麻竹",
+      "category": "都市",
+      "rank_type": "recom",
+      "prev_rank": 85,
+      "cur_rank": 170,
+      "z_score": -2.53,
+      "direction": "down"
+    },
+    {
+      "title": "全职法师",
+      "author": "乱",
+      "category": "玄幻",
+      "rank_type": "newfans",
+      "prev_rank": 112,
+      "cur_rank": 39,
+      "z_score": 2.52,
+      "direction": "up"
+    }
+  ],
+  "n_anomalies": 26,
+  "week": "2026-W27",
+  "updated_at": "2026-07-02T16:00:49.845712"
+}

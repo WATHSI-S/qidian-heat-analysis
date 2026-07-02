@@ -40,11 +40,12 @@
   <!-- Overview Marks -->
   <section class="marks-row" id="aiStats"></section>
 
-  <!-- Market Report -->
+  <!-- Agent Report -->
   <section class="panel">
-    <h2 class="panel-title">本周AI市场报告</h2>
-    <div class="report-body" id="marketReport">
-      <p class="placeholder">报告生成中，请稍候…</p>
+    <h2 class="panel-title">AI Agent 市场分析报告</h2>
+    <span style="font-size:11px;color:var(--text-muted)">ReAct Agent 自主探索数据 · 智能诊断市场趋势</span>
+    <div class="report-body" id="agentReport">
+      <p class="placeholder">Agent 分析报告生成中，请稍候…</p>
     </div>
   </section>
 
@@ -91,6 +92,25 @@
   <section class="panel">
     <h2 class="panel-title">流派标签共现关系</h2>
     <div class="chart-container chart-lg" id="chart-cooccurrence"></div>
+  </section>
+
+  <!-- Intelligent Q&A Chat Widget -->
+  <section class="panel">
+    <h2 class="panel-title">智能问答 — 问问天机</h2>
+    <div class="section-intro">
+      基于 AI Agent 分析结果和全站数据的智能问答。输入问题，天机将为你解答网文创作风向相关的问题。
+    </div>
+    <div class="chat-widget" id="chatWidget">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg chat-msg-agent">
+          <div class="chat-msg-content">你好，我是天机。你可以问我关于网文创作风向、热门品类、题材趋势等问题。比如"本周最热门的品类是什么？"或"新人作者应该选择什么题材？"</div>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="问问天机，知晓风向…" />
+        <button id="chatSend">发送</button>
+      </div>
+    </div>
   </section>
 
 </main>

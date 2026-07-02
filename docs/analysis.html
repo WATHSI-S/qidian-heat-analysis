@@ -94,6 +94,30 @@
     <div class="cat-grid" id="categoryGrid"></div>
   </section>
 
+  <!-- Association Rules Sankey -->
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">榜单关联 — 共现流向</h2>
+      <span style="font-size:11px;color:var(--text-muted)">Apriori 关联规则挖掘 · 支持度≥5% · 置信度≥50%</span>
+    </div>
+    <div class="section-intro">
+      桑基图展示榜单间的关联规则流向。连线粗细代表提升度（Lift），越大说明两榜共现关系越强。
+    </div>
+    <div class="chart-container chart-lg" id="chart-association"></div>
+  </section>
+
+  <!-- K-means Clustering Scatter -->
+  <section class="panel">
+    <div class="panel-header">
+      <h2 class="panel-title">书籍聚类画像 — K-Means 聚类分析</h2>
+      <span style="font-size:11px;color:var(--text-muted)">K-Means k=4 · PCA 降维至 2D · 特征向量 = 8榜归一化排名</span>
+    </div>
+    <div class="section-intro">
+      散点图展示书籍在多榜表现空间中的聚类分布。每点代表一本书，颜色标记聚类，距离越近说明多榜表现模式越相似。
+    </div>
+    <div class="chart-container chart-lg" id="chart-clusters"></div>
+  </section>
+
 </main>
 
 <footer class="endnote">

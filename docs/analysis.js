@@ -84,6 +84,11 @@ async function loadAllWeeks(index) {
   return snaps;
 }
 
+async function loadAnalysisFile(filename) {
+  try { return await fetchJSON(DATA_BASE + 'analysis/' + filename); }
+  catch { return null; }
+}
+
 // ═══════════════════════════════════════════════
 // ALGORITHMS
 // ═══════════════════════════════════════════════
@@ -308,11 +313,12 @@ function renderHeatTable(heatScores, momentum) {
 
 // ── Rank Changes Table ──
 
-function renderChangesTable(currentWeek, previousWeek, rankType) {
+function renderChangesTable(currentWeek, previousWeek, rankType, anomalyMap) {
   const tbody = document.querySelector('#changesTable tbody');
   if (!tbody) return;
 
   const changes = computeRankChanges(currentWeek, previousWeek, rankType);
+  anomalyMap = anomalyMap || {};
 
   // Stats
   const newCount = changes.filter(c => c.changeClass === 'new').length;
@@ -322,6 +328,15 @@ function renderChangesTable(currentWeek, previousWeek, rankType) {
     `新晋 ${newCount} · 上升 ${upCount} · 下降 ${downCount} · 持平 ${changes.length - newCount - upCount - downCount}`;
 
   tbody.innerHTML = changes.slice(0, 125).map(c => {
+    const anomalyKey = c.title + '|' + c.author + '|' + c.rank_type;
+    const anomaly = anomalyMap[anomalyKey];
+    let anomalyCls = '';
+    let anomalyMarker = '';
+    if (anomaly) {
+      anomalyCls = anomaly.z_score > 0 ? ' anomaly-up' : ' anomaly-down';
+      anomalyMarker = `<span class="anomaly-tag" title="Z-score: ${anomaly.z_score}">⚠</span>`;
+    }
+
     let cls, marker;
     if (c.changeClass === 'new') { cls = 'chg-new'; marker = '<span class="chg-badge new">新晋</span>'; }
     else if (c.changeClass === 'up') { cls = 'chg-up'; marker = `<span class="chg-badge up">↑${c.delta}</span>`; }
@@ -329,9 +344,9 @@ function renderChangesTable(currentWeek, previousWeek, rankType) {
     else { cls = ''; marker = '<span class="chg-badge none">—</span>'; }
 
     return `
-      <tr class="${cls}">
+      <tr class="${cls}${anomalyCls}">
         <td>${c.rank}</td>
-        <td><a href="${c.url || '#'}" target="_blank" rel="noopener">${esc(c.title)}</a></td>
+        <td><a href="${c.url || '#'}" target="_blank" rel="noopener">${esc(c.title)} ${anomalyMarker}</a></td>
         <td>${esc(c.author)}</td>
         <td>${c.prevRank != null ? '#' + c.prevRank : '—'}</td>
         <td>#${c.rank}</td>
@@ -344,7 +359,7 @@ function renderChangesTable(currentWeek, previousWeek, rankType) {
 
 // ── Rank Changes Pill Selector ──
 
-function buildChangesPills(currentWeek, previousWeek) {
+function buildChangesPills(currentWeek, previousWeek, anomalyMap) {
   const container = document.getElementById('changesTabs');
   container.innerHTML = Object.entries(RANK_LABELS).map(([k, v]) =>
     `<button class="rank-pill${k === currentChangeTab ? ' active' : ''}" data-rank="${k}">${v}</button>`
@@ -355,7 +370,7 @@ function buildChangesPills(currentWeek, previousWeek) {
       container.querySelectorAll('.rank-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentChangeTab = btn.dataset.rank;
-      renderChangesTable(currentWeek, previousWeek, currentChangeTab);
+      renderChangesTable(currentWeek, previousWeek, currentChangeTab, anomalyMap);
     });
   });
 }
@@ -485,6 +500,142 @@ function renderCategoryGrid(catRankings) {
   `).join('');
 }
 
+// ── Association Rules Sankey ──
+
+function renderAssociationSankey(assocData) {
+  const chart = initChart('chart-association');
+  if (!chart) return;
+
+  if (!assocData || assocData.error || !assocData.rules || assocData.rules.length === 0) {
+    chart.setOption({
+      title: { text: '关联规则数据暂不可用', left: 'center', top: 'center',
+        textStyle: { color: DARK_TEXT, fontSize: 13 } },
+    });
+    return;
+  }
+
+  const rules = assocData.rules;
+  const nodes = [];
+  const nodeMap = {};
+  const seen = new Set();
+
+  rules.forEach(r => {
+    [r.antecedent, r.consequent].forEach(name => {
+      if (!nodeMap[name]) {
+        nodeMap[name] = RANK_LABELS[name] || name;
+        nodes.push({ name: nodeMap[name] });
+      }
+    });
+  });
+
+  const links = rules.map(r => ({
+    source: nodeMap[r.antecedent],
+    target: nodeMap[r.consequent],
+    value: Math.round(r.lift * 100) / 100,
+  }));
+
+  chart.setOption({
+    tooltip: {
+      ...darkTooltip(),
+      trigger: 'item',
+      formatter: p => {
+        if (p.dataType === 'edge' || p.data && p.data.source) {
+          return `<b>${p.data.source}</b> → <b>${p.data.target}</b><br/>提升度: ${p.data.value}`;
+        }
+        return p.name;
+      },
+    },
+    series: [{
+      type: 'sankey',
+      layout: 'none',
+      emphasis: { focus: 'adjacency' },
+      nodeAlign: 'left',
+      data: nodes,
+      links: links,
+      label: { color: '#c0b8a8', fontSize: 11 },
+      lineStyle: { color: 'gradient', curveness: 0.5 },
+      itemStyle: { borderColor: '#1e1b15', borderWidth: 1 },
+      color: ['#e8c878', '#5b8db8', '#27ae60', '#e67e22', '#e74c3c', '#8e44ad', '#1abc9c', '#e91e63'],
+    }],
+  }, true);
+}
+
+// ── K-means Clustering Scatter ──
+
+const CLUSTER_COLORS = ['#e8c878', '#5b8db8', '#27ae60', '#e67e22', '#e74c3c', '#8e44ad'];
+
+function renderClusterScatter(clusterData) {
+  const chart = initChart('chart-clusters');
+  if (!chart) return;
+
+  if (!clusterData || clusterData.error || !clusterData.clusters || clusterData.clusters.length === 0) {
+    chart.setOption({
+      title: { text: '聚类数据暂不可用', left: 'center', top: 'center',
+        textStyle: { color: DARK_TEXT, fontSize: 13 } },
+    });
+    return;
+  }
+
+  const series = clusterData.clusters.map((cl, idx) => ({
+    name: cl.label + ' (' + cl.size + '本)',
+    type: 'scatter',
+    data: cl.books.map(b => ({
+      value: b.coords,
+      title: b.title,
+      author: b.author,
+      category: b.category,
+    })),
+    symbolSize: 8,
+    itemStyle: { color: CLUSTER_COLORS[idx % CLUSTER_COLORS.length], opacity: 0.8 },
+    emphasis: { scale: 1.5 },
+  }));
+
+  const pcaVar = clusterData.pca_variance || [];
+  const xLabel = pcaVar[0] ? `PC1 (${Math.round(pcaVar[0] * 100)}%)` : 'PC1';
+  const yLabel = pcaVar[1] ? `PC2 (${Math.round(pcaVar[1] * 100)}%)` : 'PC2';
+
+  chart.setOption({
+    tooltip: {
+      ...darkTooltip(),
+      trigger: 'item',
+      formatter: p => {
+        const d = p.data;
+        return `<b>${esc(d.title)}</b><br/>`
+          + `作者: ${esc(d.author)}<br/>`
+          + `分类: ${esc(d.category)}<br/>`
+          + `聚类: ${p.seriesName}`;
+      },
+    },
+    legend: {
+      bottom: 0,
+      textStyle: { color: DARK_TEXT, fontSize: 11 },
+      data: series.map(s => s.name),
+    },
+    grid: { left: 10, right: 20, top: 10, bottom: 40, containLabel: true },
+    xAxis: {
+      type: 'value', ...darkAxis(xLabel),
+      splitLine: { show: false },
+    },
+    yAxis: {
+      type: 'value', ...darkAxis(yLabel),
+      splitLine: { show: false },
+    },
+    series,
+  }, true);
+}
+
+// ── Anomaly Highlights (integrated into rank changes table) ──
+
+function loadAnomalyMap(anomalyData) {
+  if (!anomalyData || anomalyData.error || !anomalyData.anomalies) return {};
+  const map = {};
+  anomalyData.anomalies.forEach(a => {
+    const key = a.title + '|' + a.author + '|' + a.rank_type;
+    map[key] = a;
+  });
+  return map;
+}
+
 // ═══════════════════════════════════════════════
 // MAIN
 // ═══════════════════════════════════════════════
@@ -510,14 +661,30 @@ async function main() {
     const appearances = computeAppearances(allWeeks);
     const catRankings = computeCategoryRankings(books);
 
-    // Render all sections
+    // Render core sections
     renderOverview(index, heatScores, momentum, allWeeks);
     renderHeatTable(heatScores, momentum);
-    buildChangesPills(currentWeek, previousWeek);
-    renderChangesTable(currentWeek, previousWeek, currentChangeTab);
+
+    // Load data mining results (non-blocking)
+    const [assocData, clusterData, anomalyData] = await Promise.allSettled([
+      loadAnalysisFile('association_rules.json'),
+      loadAnalysisFile('clusters.json'),
+      loadAnalysisFile('anomalies.json'),
+    ]);
+
+    const assoc = assocData.status === 'fulfilled' ? assocData.value : null;
+    const clusters = clusterData.status === 'fulfilled' ? clusterData.value : null;
+    const anomalies = anomalyData.status === 'fulfilled' ? anomalyData.value : null;
+    const anomalyMap = loadAnomalyMap(anomalies);
+
+    // Render with anomaly highlights
+    buildChangesPills(currentWeek, previousWeek, anomalyMap);
+    renderChangesTable(currentWeek, previousWeek, currentChangeTab, anomalyMap);
     renderLongevityChart(appearances);
     renderCoverageChart(heatScores);
     renderCategoryGrid(catRankings);
+    renderAssociationSankey(assoc);
+    renderClusterScatter(clusters);
 
   } catch (err) {
     console.error('分析启动失败:', err);

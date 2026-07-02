@@ -28,11 +28,20 @@ jobs:
       - name: Run text mining analysis
         run: python scraper/analysis/pipeline.py --text-only
 
+      - name: Run data mining analysis
+        run: python scraper/analysis/pipeline.py --data-mining-only
+
       - name: Run LLM analysis
         continue-on-error: true
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python scraper/analysis/pipeline.py --skip-text-mining
+
+      - name: Run AI Agent analysis
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scraper/analysis/pipeline.py --agent-only
 
       - name: Copy data into docs for deployment
         run: |
