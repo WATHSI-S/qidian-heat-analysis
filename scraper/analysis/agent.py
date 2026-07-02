@@ -5,6 +5,7 @@ FAQ generation, and structured report output.
 
 import json
 import logging
+import math
 import os
 import re
 import time
@@ -272,7 +273,6 @@ def _tool_get_category_trend(category: str) -> str:
         heat = 0.0
         for b in cat_books:
             wgt = RANK_WEIGHTS.get(b.get("rank_type", ""), 0.5)
-            import math
             heat += wgt / math.sqrt(max(b.get("rank", 200), 1))
         trend.append({
             "week": w["week"],
@@ -350,7 +350,6 @@ def _tool_compare_weeks(week1: str, week2: str) -> str:
     # Category heat changes
     cat_heat1 = Counter()
     cat_heat2 = Counter()
-    import math
     for b in w1["books"]:
         if b.get("category"):
             wgt = RANK_WEIGHTS.get(b.get("rank_type", ""), 0.5)
@@ -430,8 +429,8 @@ def _run_react_loop(client, week_label: str) -> tuple[str, list[dict]]:
             messages.append({"role": "assistant", "content": content})
             continue
 
-        # Process tool calls
-        assistant_msg = {"role": "assistant", "content": msg.content or "", "tool_calls": []}
+        # Process tool calls: collect results first, then push one assistant_msg + N tool messages
+        tool_results = []
 
         for tc in msg.tool_calls:
             func_name = tc.function.name
@@ -458,17 +457,30 @@ def _run_react_loop(client, week_label: str) -> tuple[str, list[dict]]:
                 "result_preview": result[:200],
             })
 
-            assistant_msg["tool_calls"].append({
+            tool_results.append({
                 "id": tc.id,
-                "type": "function",
                 "function": {"name": func_name, "arguments": tc.function.arguments},
+                "result": result,
             })
 
-            messages.append(assistant_msg)
+        # Push one assistant message with all tool_calls
+        assistant_msg = {
+            "role": "assistant",
+            "content": msg.content or "",
+            "tool_calls": [{
+                "id": tr["id"],
+                "type": "function",
+                "function": tr["function"],
+            } for tr in tool_results],
+        }
+        messages.append(assistant_msg)
+
+        # Push one tool message per result
+        for tr in tool_results:
             messages.append({
                 "role": "tool",
-                "tool_call_id": tc.id,
-                "content": result,
+                "tool_call_id": tr["id"],
+                "content": tr["result"],
             })
 
         time.sleep(0.3)  # Rate limiting

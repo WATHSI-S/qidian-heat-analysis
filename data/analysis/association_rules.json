@@ -29,15 +29,15 @@
       "lift": 2.4594
     },
     {
-      "antecedent": "newfans",
-      "consequent": "hotsales",
+      "antecedent": "hotsales",
+      "consequent": "newfans",
       "support": 0.1516,
       "confidence": 0.5889,
       "lift": 2.2869
     },
     {
-      "antecedent": "hotsales",
-      "consequent": "newfans",
+      "antecedent": "newfans",
+      "consequent": "hotsales",
       "support": 0.1516,
       "confidence": 0.5889,
       "lift": 2.2869
@@ -73,5 +73,5 @@
   ],
   "n_transactions": 699,
   "week": "2026-W27",
-  "updated_at": "2026-07-02T16:00:48.196305"
+  "updated_at": "2026-07-02T16:22:28.550651"
 }

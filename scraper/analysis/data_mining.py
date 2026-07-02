@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
+import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
@@ -177,7 +178,6 @@ def mine_association_rules(data_dir: Path = None, week_label: str = None) -> dic
         logger.warning("Too few books for association mining: %d", len(book_ranks))
         return {"error": "insufficient_data", "n_books": len(book_ranks)}
 
-    import pandas as pd
     df = pd.DataFrame(list(book_ranks.values()))
     df = df.astype(bool)
 

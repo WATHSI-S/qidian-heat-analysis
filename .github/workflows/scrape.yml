@@ -29,6 +29,7 @@ jobs:
         run: python scraper/analysis/pipeline.py --text-only
 
       - name: Run data mining analysis
+        continue-on-error: true
         run: python scraper/analysis/pipeline.py --data-mining-only
 
       - name: Run LLM analysis

@@ -149,91 +149,43 @@ function renderAgentReport(data) {
 // ── Chat Widget ──
 
 let faqDB = [];
-let faqVectors = [];
 
-// Simple tokenizer: unigram + bigram for Chinese text
+// Simple tokenizer for Chinese text
 function tokenize(text) {
   const cleaned = text.replace(/[^一-鿿\w]/g, ' ');
-  const chars = cleaned.split(/\s+/).filter(w => w.length >= 1);
-  const tokens = [];
-  chars.forEach(c => {
-    if (c.length >= 2) tokens.push(c);
-    for (let i = 0; i < c.length - 1; i++) {
-      tokens.push(c.substring(i, i + 2));
+  const words = cleaned.split(/\s+/).filter(w => w.length >= 2);
+  // Also add bigrams from continuous char sequences
+  const bigrams = [];
+  for (const w of words) {
+    for (let i = 0; i < w.length - 1; i++) {
+      bigrams.push(w.substring(i, i + 2));
     }
-  });
-  return tokens;
-}
-
-// Build TF-IDF-like vectors from FAQ data
-function buildFAQIndex(faqItems) {
-  const allTokens = new Set();
-  faqItems.forEach(item => {
-    const tokens = tokenize(item.q + ' ' + (item.keywords || []).join(' '));
-    item._tokens = tokens;
-    tokens.forEach(t => allTokens.add(t));
-  });
-
-  const tokenList = Array.from(allTokens);
-  const tokenIdx = {};
-  tokenList.forEach((t, i) => { tokenIdx[t] = i; });
-
-  faqVectors = faqItems.map(item => {
-    const vec = new Array(tokenList.length).fill(0);
-    const tf = {};
-    item._tokens.forEach(t => { tf[t] = (tf[t] || 0) + 1; });
-    const maxFreq = Math.max(...Object.values(tf), 1);
-    // Simple TF-IDF approximation
-    Object.entries(tf).forEach(([t, freq]) => {
-      const idx = tokenIdx[t];
-      if (idx !== undefined) {
-        const tfNorm = freq / maxFreq;
-        const docsWithTerm = faqItems.filter(f => f._tokens.includes(t)).length;
-        const idf = Math.log(faqItems.length / (docsWithTerm + 1)) + 1;
-        vec[idx] = tfNorm * idf;
-      }
-    });
-    return vec;
-  });
-
-  faqDB = faqItems;
-}
-
-function cosineSimilarity(a, b) {
-  let dot = 0, magA = 0, magB = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    magA += a[i] * a[i];
-    magB += b[i] * b[i];
   }
-  if (magA === 0 || magB === 0) return 0;
-  return dot / (Math.sqrt(magA) * Math.sqrt(magB));
+  return [...words, ...bigrams];
+}
+
+// Tokenize FAQ items for matching
+function buildFAQIndex(faqItems) {
+  faqItems.forEach(item => {
+    item._tokens = tokenize(item.q + ' ' + (item.keywords || []).join(' '));
+  });
+  faqDB = faqItems;
 }
 
 function matchFAQ(query) {
   if (faqDB.length === 0) return null;
 
-  const queryTokens = tokenize(query);
-  const queryVec = new Array(faqVectors[0].length).fill(0);
-  const tf = {};
-  queryTokens.forEach(t => { tf[t] = (tf[t] || 0) + 1; });
-  const maxFreq = Math.max(...Object.values(tf), 1);
-  const tokenIdxMap = {};
-
-  // Rebuild token index from the first FAQ vector
-  // We need the original token list... let me use a different approach
-  // Instead, use simple Jaccard-like token overlap matching
+  const queryTokens = new Set(tokenize(query));
   let bestMatch = null;
   let bestScore = 0;
 
   faqDB.forEach(item => {
     const itemTokens = new Set(item._tokens);
-    const queryTokenSet = new Set(queryTokens);
     let overlap = 0;
-    queryTokenSet.forEach(t => {
+    queryTokens.forEach(t => {
       if (itemTokens.has(t)) overlap++;
     });
-    const union = new Set([...itemTokens, ...queryTokenSet]).size;
+    const union = new Set([...itemTokens, ...queryTokens]).size;
     const score = union > 0 ? overlap / Math.sqrt(union) : 0;
     // Bonus for keyword match
     const kwBonus = (item.keywords || []).filter(k => query.includes(k)).length * 0.15;
