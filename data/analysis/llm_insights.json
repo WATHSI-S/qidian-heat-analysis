@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-08-24T01:21:13.852692",
+  "updated_at": "2026-08-31T03:57:30.533594",
   "model": "deepseek-chat",
   "n_books": 120,
   "books": [
     {
-      "title": "《捞尸人》",
+      "title": "捞尸人",
       "genre_tags": [
         "灵异",
         "悬疑"
@@ -18,7 +18,7 @@
       ]
     },
     {
-      "title": "《玄鉴仙族》",
+      "title": "玄鉴仙族",
       "genre_tags": [
         "仙侠",
         "家族",
@@ -34,7 +34,7 @@
       ]
     },
     {
-      "title": "《夜无疆》",
+      "title": "夜无疆",
       "genre_tags": [
         "玄幻",
         "末世"
@@ -43,30 +43,14 @@
       "golden_finger": "无/未提及",
       "world_keywords": [
         "永夜",
-        "末世"
+        "太阳消失"
       ]
     },
     {
-      "title": "《1984：从破产川菜馆开始》",
-      "genre_tags": [
-        "年代文",
-        "美食",
-        "种田",
-        "重生"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "1984",
-        "川菜馆",
-        "美食",
-        "种田"
-      ]
-    },
-    {
-      "title": "《没钱修什么仙？》",
+      "title": "没钱修什么仙？",
       "genre_tags": [
         "仙侠",
+        "修炼",
         "凡人流"
       ],
       "protagonist_archetype": "废柴逆袭",
@@ -74,59 +58,31 @@
       "world_keywords": [
         "修仙",
         "报仇",
-        "宗门"
+        "师尊"
       ]
     },
     {
-      "title": "《星河之主》",
-      "genre_tags": [
-        "星际",
-        "科幻",
-        "修炼"
-      ],
-      "protagonist_archetype": "天才流",
-      "golden_finger": "特殊血脉/体质",
-      "world_keywords": [
-        "星际",
-        "月星",
-        "星空武者"
-      ]
-    },
-    {
-      "title": "《剑烛大荒》",
-      "genre_tags": [
-        "玄幻",
-        "洪荒"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "特殊血脉/体质",
-      "world_keywords": [
-        "大荒",
-        "烛龙",
-        "相柳",
-        "妖兽"
-      ]
-    },
-    {
-      "title": "《以神通之名》",
+      "title": "1984：从破产川菜馆开始",
       "genre_tags": [
         "都市",
-        "异能",
-        "灵气复苏"
+        "年代文",
+        "美食",
+        "种田"
       ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "其他",
+      "protagonist_archetype": "重生复仇",
+      "golden_finger": "重生知识",
       "world_keywords": [
-        "大灾变",
-        "神州",
-        "武侯"
+        "1984",
+        "川菜馆",
+        "美食",
+        "重生"
       ]
     },
     {
-      "title": "《青山》",
+      "title": "青山",
       "genre_tags": [
-        "武侠",
-        "权谋"
+        "玄幻",
+        "武侠"
       ],
       "protagonist_archetype": "其他",
       "golden_finger": "无/未提及",
@@ -136,57 +92,105 @@
       ]
     },
     {
-      "title": "《让仙门再次伟大》",
+      "title": "廓晋",
+      "genre_tags": [
+        "历史",
+        "权谋",
+        "争霸"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "东晋十六国",
+        "北伐",
+        "士族",
+        "门阀"
+      ]
+    },
+    {
+      "title": "以神通之名",
+      "genre_tags": [
+        "都市",
+        "异能",
+        "末世"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "大灾变",
+        "武侯",
+        "人类自留地"
+      ]
+    },
+    {
+      "title": "剑烛大荒",
       "genre_tags": [
         "玄幻",
+        "神话"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "特殊血脉/体质",
+      "world_keywords": [
+        "烛龙",
+        "相柳",
+        "大荒",
+        "神兽"
+      ]
+    },
+    {
+      "title": "星河之主",
+      "genre_tags": [
+        "玄幻",
+        "星际",
+        "修炼"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "月星",
+        "星空武者",
+        "新历"
+      ]
+    },
+    {
+      "title": "异度旅社",
+      "genre_tags": [
+        "科幻",
+        "悬疑",
+        "无限流"
+      ],
+      "protagonist_archetype": "普通人生存",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "异度空间",
+        "门",
+        "日常之下"
+      ]
+    },
+    {
+      "title": "让仙门再次伟大",
+      "genre_tags": [
+        "玄幻",
+        "修仙",
         "权谋"
       ],
       "protagonist_archetype": "其他",
       "golden_finger": "无/未提及",
       "world_keywords": [
         "修行者",
-        "仙门"
+        "仙门",
+        "共存"
       ]
     },
     {
-      "title": "《廓晋》",
-      "genre_tags": [
-        "历史",
-        "权谋",
-        "争霸"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "东晋十六国",
-        "北伐",
-        "士族"
-      ]
-    },
-    {
-      "title": "《以一龙之力打倒整个世界！》",
-      "genre_tags": [
-        "轻小说",
-        "龙族",
-        "无敌流"
-      ],
-      "protagonist_archetype": "无敌流",
-      "golden_finger": "特殊血脉/体质",
-      "world_keywords": [
-        "龙",
-        "血脉",
-        "世界"
-      ]
-    },
-    {
-      "title": "《诡秘之主》",
+      "title": "诡秘之主",
       "genre_tags": [
         "玄幻",
-        "蒸汽朋克",
-        "悬疑"
+        "悬疑",
+        "蒸汽朋克"
       ],
       "protagonist_archetype": "其他",
-      "golden_finger": "其他",
+      "golden_finger": "传承/老爷爷",
       "world_keywords": [
         "蒸汽",
         "机械",
@@ -196,53 +200,55 @@
       ]
     },
     {
-      "title": "《姐姐，我也要一起当女仆吗？》",
+      "title": "以一龙之力打倒整个世界！",
       "genre_tags": [
         "轻小说",
-        "恋爱日常",
-        "双胞胎"
+        "龙族",
+        "无敌流"
       ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "无/未提及",
+      "protagonist_archetype": "无敌流",
+      "golden_finger": "特殊血脉/体质",
       "world_keywords": [
-        "女仆",
-        "双胞胎",
-        "恋爱"
+        "红龙",
+        "铁龙",
+        "血脉",
+        "烈焰",
+        "钢铁"
       ]
     },
     {
-      "title": "《武道！》",
+      "title": "武道！",
       "genre_tags": [
         "玄幻",
-        "穿越",
-        "江湖"
+        "武道",
+        "穿越"
       ],
       "protagonist_archetype": "穿越者",
       "golden_finger": "无/未提及",
       "world_keywords": [
-        "香海",
-        "江湖",
+        "城寨",
         "拳馆",
-        "殖民"
+        "香海",
+        "殖民政府"
       ]
     },
     {
-      "title": "《异度旅社》",
+      "title": "姐姐，我也要一起当女仆吗？",
       "genre_tags": [
-        "科幻",
-        "悬疑",
-        "无限流"
-      ],
-      "protagonist_archetype": "普通人生存",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "异度",
-        "门",
+        "轻小说",
+        "恋爱",
         "日常"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "双胞胎",
+        "女仆",
+        "收租"
       ]
     },
     {
-      "title": "《我的魔法没有上限！》",
+      "title": "我的魔法没有上限！",
       "genre_tags": [
         "奇幻",
         "系统流",
@@ -252,27 +258,43 @@
       "golden_finger": "系统",
       "world_keywords": [
         "异世界",
-        "魔法",
-        "天赋"
+        "魔法师",
+        "天赋技能"
       ]
     },
     {
-      "title": "《东京：崇华的我竟成了日娱之王》",
+      "title": "东京：崇华的我竟成了日娱之王",
       "genre_tags": [
         "轻小说",
-        "穿越",
-        "娱乐"
+        "娱乐圈",
+        "穿越"
       ],
       "protagonist_archetype": "穿越者",
-      "golden_finger": "重生知识",
+      "golden_finger": "无/未提及",
       "world_keywords": [
         "东京",
-        "日娱",
-        "平成"
+        "平成",
+        "日娱"
       ]
     },
     {
-      "title": "《万生痴魔》",
+      "title": "请勿高考时渡劫",
+      "genre_tags": [
+        "都市",
+        "灵气复苏",
+        "搞笑"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "妖魔鬼怪",
+        "修士",
+        "现代社会",
+        "高考"
+      ]
+    },
+    {
+      "title": "万生痴魔",
       "genre_tags": [
         "玄幻",
         "种田",
@@ -282,16 +304,31 @@
       "golden_finger": "其他",
       "world_keywords": [
         "种田",
-        "手艺",
-        "万生"
+        "蛤蟆",
+        "老虎",
+        "手艺"
       ]
     },
     {
-      "title": "《今天他飞升了吗》",
+      "title": "北望江山",
+      "genre_tags": [
+        "历史",
+        "穿越",
+        "争霸"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "元朝末年",
+        "挣扎"
+      ]
+    },
+    {
+      "title": "今天他飞升了吗",
       "genre_tags": [
         "仙侠",
         "日常",
-        "轻松"
+        "搞笑"
       ],
       "protagonist_archetype": "其他",
       "golden_finger": "无/未提及",
@@ -302,37 +339,7 @@
       ]
     },
     {
-      "title": "《急急如律令》",
-      "genre_tags": [
-        "科幻",
-        "灵异",
-        "都市"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "灵异复苏",
-        "鬼",
-        "法术"
-      ]
-    },
-    {
-      "title": "《北望江山》",
-      "genre_tags": [
-        "历史",
-        "穿越",
-        "争霸"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "元朝末年",
-        "挣扎",
-        "江山"
-      ]
-    },
-    {
-      "title": "《清光宝鉴》",
+      "title": "清光宝鉴",
       "genre_tags": [
         "仙侠",
         "修炼"
@@ -341,43 +348,30 @@
       "golden_finger": "传承/老爷爷",
       "world_keywords": [
         "修仙",
-        "水中月",
-        "宝鉴"
+        "宝鉴",
+        "月",
+        "红尘"
       ]
     },
     {
-      "title": "《我，枪神！》",
+      "title": "急急如律令",
       "genre_tags": [
-        "都市",
-        "军事",
-        "异能"
+        "科幻",
+        "灵异",
+        "搞笑"
       ],
-      "protagonist_archetype": "废柴逆袭",
+      "protagonist_archetype": "其他",
       "golden_finger": "其他",
       "world_keywords": [
-        "枪神",
-        "战场",
-        "俄乌"
+        "灵异复苏",
+        "鬼",
+        "法"
       ]
     },
     {
-      "title": "《冬日重现》",
+      "title": "1979黄金时代",
       "genre_tags": [
-        "轻小说",
-        "悬疑",
-        "重生"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "女同学",
-        "死亡",
-        "时间"
-      ]
-    },
-    {
-      "title": "《1979黄金时代》",
-      "genre_tags": [
+        "都市",
         "年代文",
         "怀旧"
       ],
@@ -386,260 +380,6 @@
       "world_keywords": [
         "1979",
         "怀旧"
-      ]
-    },
-    {
-      "title": "《我的学习群里全是真大佬》",
-      "genre_tags": [
-        "都市",
-        "学霸",
-        "系统流"
-      ],
-      "protagonist_archetype": "废柴逆袭",
-      "golden_finger": "系统",
-      "world_keywords": [
-        "学习群",
-        "大佬",
-        "学霸"
-      ]
-    },
-    {
-      "title": "《请勿高考时渡劫》",
-      "genre_tags": [
-        "都市",
-        "灵气复苏",
-        "搞笑"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "无/未提及",
-      "world_keywords": [
-        "妖魔鬼怪",
-        "现代",
-        "高考",
-        "渡劫"
-      ]
-    },
-    {
-      "title": "《超人灭绝指南》",
-      "genre_tags": [
-        "轻小说",
-        "穿越",
-        "无敌流"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "特殊血脉/体质",
-      "world_keywords": [
-        "超人",
-        "魔法少女",
-        "外星人",
-        "神话"
-      ]
-    },
-    {
-      "title": "《人在美利坚：我的叔叔堂吉诃德》",
-      "genre_tags": [
-        "都市",
-        "美利坚",
-        "日常"
-      ],
-      "protagonist_archetype": "普通人生存",
-      "golden_finger": "无/未提及",
-      "world_keywords": [
-        "美利坚",
-        "债务",
-        "堂吉诃德"
-      ]
-    },
-    {
-      "title": "仙道尽头",
-      "genre_tags": [
-        "穿越",
-        "仙侠",
-        "轻松"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "仙侠",
-        "穿越",
-        "成亲",
-        "牛"
-      ]
-    },
-    {
-      "title": "从水猴子开始成神",
-      "genre_tags": [
-        "穿越",
-        "修炼",
-        "成神"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "水猴子",
-        "成神",
-        "深水神草",
-        "渔民"
-      ]
-    },
-    {
-      "title": "这个武圣太谨慎了",
-      "genre_tags": [
-        "穿越",
-        "武道",
-        "杀伐果断"
-      ],
-      "protagonist_archetype": "苟道稳健",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "武道",
-        "武圣",
-        "谨慎",
-        "穿越"
-      ]
-    },
-    {
-      "title": "诳言法师的十三试炼",
-      "genre_tags": [
-        "校园",
-        "恋爱",
-        "英雄"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "校园",
-        "恋爱",
-        "英雄",
-        "试炼"
-      ]
-    },
-    {
-      "title": "夺嫡在嘉靖朝",
-      "genre_tags": [
-        "历史",
-        "权谋",
-        "宫斗"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "无/未提及",
-      "world_keywords": [
-        "明朝",
-        "嘉靖",
-        "夺嫡",
-        "权谋"
-      ]
-    },
-    {
-      "title": "律师：从合法报复出轨开始！",
-      "genre_tags": [
-        "都市",
-        "律师",
-        "系统流"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "系统",
-      "world_keywords": [
-        "律师",
-        "穿越",
-        "2002年",
-        "奖励"
-      ]
-    },
-    {
-      "title": "天才只是我的门槛！",
-      "genre_tags": [
-        "都市",
-        "重生",
-        "科研"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "重生",
-        "天才",
-        "科研",
-        "科技"
-      ]
-    },
-    {
-      "title": "元始法则",
-      "genre_tags": [
-        "玄幻",
-        "修炼",
-        "星空"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "星空",
-        "道城",
-        "祖洲",
-        "神仓古泽"
-      ]
-    },
-    {
-      "title": "我在永夜打造庇护所",
-      "genre_tags": [
-        "穿越",
-        "末世",
-        "种田"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "永夜",
-        "诡物",
-        "庇护所",
-        "穿越"
-      ]
-    },
-    {
-      "title": "同时穿越：继承万界遗产",
-      "genre_tags": [
-        "穿越",
-        "无限流",
-        "诸天"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "遮天",
-        "诸天万界",
-        "战力叠加",
-        "穿越"
-      ]
-    },
-    {
-      "title": "我绑定了夏弥",
-      "genre_tags": [
-        "同人",
-        "系统流",
-        "重生"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "系统",
-      "world_keywords": [
-        "龙族",
-        "屠龙",
-        "绑定",
-        "平行世界"
-      ]
-    },
-    {
-      "title": "宿命之环",
-      "genre_tags": [
-        "玄幻",
-        "悬疑",
-        "克苏鲁"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "无/未提及",
-      "world_keywords": [
-        "诡秘",
-        "深红",
-        "1368年",
-        "末日"
       ]
     },
     {
@@ -652,58 +392,41 @@
       "protagonist_archetype": "其他",
       "golden_finger": "其他",
       "world_keywords": [
-        "天选者",
         "毁灭",
         "重建",
-        "超凡"
+        "天选者",
+        "历史阴影"
       ]
     },
     {
-      "title": "苟在两界修仙",
-      "genre_tags": [
-        "穿越",
-        "修仙",
-        "苟道"
-      ],
-      "protagonist_archetype": "苟道稳健",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "两界",
-        "修仙",
-        "值岁",
-        "穿越"
-      ]
-    },
-    {
-      "title": "从魔法少女开始独断万古",
+      "title": "同时穿越：继承万界遗产",
       "genre_tags": [
         "轻小说",
-        "修真",
-        "搞笑"
+        "无限流",
+        "无敌流"
       ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "其他",
+      "protagonist_archetype": "无敌流",
+      "golden_finger": "系统",
       "world_keywords": [
-        "魔法少女",
-        "修真",
-        "独断万古",
-        "网文"
+        "遮天",
+        "诸天万界",
+        "天赋悟性",
+        "战力叠加"
       ]
     },
     {
-      "title": "尸祸一六四四",
+      "title": "从水猴子开始成神",
       "genre_tags": [
-        "历史",
-        "末世",
-        "穿越"
+        "玄幻",
+        "穿越",
+        "种田"
       ],
       "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
+      "golden_finger": "特殊血脉/体质",
       "world_keywords": [
-        "明末",
-        "崇祯",
-        "尸祸",
-        "穿越"
+        "水猴子",
+        "深水神草",
+        "渔民"
       ]
     },
     {
@@ -718,8 +441,246 @@
       "world_keywords": [
         "假面骑士",
         "帝骑",
-        "联邦",
-        "骑士"
+        "联邦"
+      ]
+    },
+    {
+      "title": "这个武圣太谨慎了",
+      "genre_tags": [
+        "玄幻",
+        "武道",
+        "苟道稳健"
+      ],
+      "protagonist_archetype": "苟道稳健",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "武道世界",
+        "谨慎",
+        "防御性出手"
+      ]
+    },
+    {
+      "title": "我的学习群里全是真大佬",
+      "genre_tags": [
+        "都市",
+        "学霸",
+        "群像",
+        "系统流"
+      ],
+      "protagonist_archetype": "废柴逆袭",
+      "golden_finger": "系统",
+      "world_keywords": [
+        "学习群",
+        "大佬",
+        "学渣",
+        "现代都市"
+      ]
+    },
+    {
+      "title": "夺嫡在嘉靖朝",
+      "genre_tags": [
+        "历史",
+        "权谋",
+        "朝堂"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "大明",
+        "嘉靖",
+        "夺嫡",
+        "朝堂"
+      ]
+    },
+    {
+      "title": "我，枪神！",
+      "genre_tags": [
+        "都市",
+        "军事",
+        "热血"
+      ],
+      "protagonist_archetype": "普通人生存",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "俄乌战场",
+        "枪战",
+        "现代战争"
+      ]
+    },
+    {
+      "title": "人在美利坚：我的叔叔堂吉诃德",
+      "genre_tags": [
+        "都市",
+        "美利坚",
+        "日常"
+      ],
+      "protagonist_archetype": "普通人生存",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "美利坚",
+        "堂吉诃德",
+        "债务",
+        "家族"
+      ]
+    },
+    {
+      "title": "天才只是我的门槛！",
+      "genre_tags": [
+        "都市",
+        "科研",
+        "科技",
+        "重生"
+      ],
+      "protagonist_archetype": "重生复仇",
+      "golden_finger": "重生知识",
+      "world_keywords": [
+        "重生",
+        "科研",
+        "科技",
+        "大国"
+      ]
+    },
+    {
+      "title": "诳言法师的十三试炼",
+      "genre_tags": [
+        "轻小说",
+        "校园",
+        "恋爱",
+        "喜剧"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "校园",
+        "魔法",
+        "试炼",
+        "恋爱喜剧"
+      ]
+    },
+    {
+      "title": "仙道尽头",
+      "genre_tags": [
+        "仙侠",
+        "穿越",
+        "轻松"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "仙侠",
+        "穿越",
+        "牛",
+        "仙女"
+      ]
+    },
+    {
+      "title": "苟在两界修仙",
+      "genre_tags": [
+        "仙侠",
+        "穿越",
+        "苟道稳健"
+      ],
+      "protagonist_archetype": "苟道稳健",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "两界",
+        "修仙",
+        "值岁"
+      ]
+    },
+    {
+      "title": "冬日重现",
+      "genre_tags": [
+        "轻小说",
+        "悬疑",
+        "校园"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "校园",
+        "悬疑",
+        "死亡",
+        "时间"
+      ]
+    },
+    {
+      "title": "元始法则",
+      "genre_tags": [
+        "玄幻",
+        "修炼",
+        "星空"
+      ],
+      "protagonist_archetype": "天才流",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "道城",
+        "祖洲",
+        "神仓古泽",
+        "战斧座空洞"
+      ]
+    },
+    {
+      "title": "白衣卿相",
+      "genre_tags": [
+        "历史",
+        "权谋",
+        "朝堂"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "汴梁",
+        "卿相",
+        "朝堂"
+      ]
+    },
+    {
+      "title": "还不起学贷的我只好兼职猎魔",
+      "genre_tags": [
+        "轻小说",
+        "奇幻",
+        "蒸汽朋克"
+      ],
+      "protagonist_archetype": "普通人生存",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "蒸汽",
+        "超凡",
+        "伦德尼姆",
+        "猎魔"
+      ]
+    },
+    {
+      "title": "我绑定了夏弥",
+      "genre_tags": [
+        "轻小说",
+        "同人",
+        "系统流"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "系统",
+      "world_keywords": [
+        "龙族",
+        "同人",
+        "绑定",
+        "屠龙"
+      ]
+    },
+    {
+      "title": "律师：从合法报复出轨开始！",
+      "genre_tags": [
+        "都市",
+        "律师",
+        "复仇"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "系统",
+      "world_keywords": [
+        "律师",
+        "出轨",
+        "2002",
+        "绿森市"
       ]
     },
     {
@@ -735,119 +696,23 @@
         "重生",
         "高考",
         "高三",
-        "人情世故"
+        "公务员"
       ]
     },
     {
-      "title": "东京医途",
+      "title": "超人灭绝指南",
       "genre_tags": [
         "轻小说",
-        "重生",
-        "医生"
+        "穿越",
+        "搞笑"
       ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "东京",
-        "重生",
-        "医生",
-        "平行世界"
-      ]
-    },
-    {
-      "title": "我真没想重生啊",
-      "genre_tags": [
-        "都市",
-        "重生",
-        "恋爱"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "重生",
-        "高三",
-        "恋爱",
-        "选择"
-      ]
-    },
-    {
-      "title": "我，影帝！",
-      "genre_tags": [
-        "都市",
-        "娱乐",
-        "演员"
-      ],
-      "protagonist_archetype": "普通人生存",
+      "protagonist_archetype": "穿越者",
       "golden_finger": "无/未提及",
       "world_keywords": [
-        "影帝",
-        "演员",
-        "横店",
-        "群演"
-      ]
-    },
-    {
-      "title": "白衣卿相",
-      "genre_tags": [
-        "历史",
-        "权谋",
-        "朝堂"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "无/未提及",
-      "world_keywords": [
-        "白衣",
-        "卿相",
-        "汴梁",
-        "朝堂"
-      ]
-    },
-    {
-      "title": "还不起学贷的我只好兼职猎魔",
-      "genre_tags": [
-        "轻小说",
-        "奇幻",
-        "学院"
-      ],
-      "protagonist_archetype": "普通人生存",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "蒸汽",
-        "超凡",
-        "猎魔",
-        "学院"
-      ]
-    },
-    {
-      "title": "龙藏",
-      "genre_tags": [
-        "玄幻",
-        "争霸",
-        "种田"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "龙",
-        "征战",
-        "工业化",
-        "仙侠"
-      ]
-    },
-    {
-      "title": "蜀山镇世地仙",
-      "genre_tags": [
-        "仙侠",
-        "道门",
-        "争霸"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "蜀山",
-        "道门",
-        "地仙",
-        "玄门"
+        "超人",
+        "魔法少女",
+        "外星人",
+        "神话"
       ]
     },
     {
@@ -860,42 +725,121 @@
       "protagonist_archetype": "其他",
       "golden_finger": "无/未提及",
       "world_keywords": [
-        "执棋",
-        "忠义",
-        "谋逆",
-        "金銮殿"
+        "仙侠",
+        "朝堂",
+        "棋局",
+        "忠义"
       ]
     },
     {
-      "title": "战锤：群星与蝼蚁",
+      "title": "神话版三国",
       "genre_tags": [
-        "轻小说",
-        "科幻",
-        "战锤"
+        "历史",
+        "三国",
+        "神话"
       ],
-      "protagonist_archetype": "其他",
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "三国",
+        "神话",
+        "吕布",
+        "赵云"
+      ]
+    },
+    {
+      "title": "我在永夜打造庇护所",
+      "genre_tags": [
+        "玄幻",
+        "末世",
+        "庇护所"
+      ],
+      "protagonist_archetype": "穿越者",
       "golden_finger": "其他",
       "world_keywords": [
-        "战锤",
-        "帝皇",
-        "原体",
-        "忠诚"
+        "永夜",
+        "诡物",
+        "庇护所",
+        "穿越"
       ]
     },
     {
-      "title": "1997：罪案追凶",
+      "title": "Z世代艺术家",
       "genre_tags": [
         "都市",
-        "悬疑",
-        "重生"
+        "重生",
+        "娱乐圈"
       ],
       "protagonist_archetype": "重生复仇",
       "golden_finger": "重生知识",
       "world_keywords": [
-        "1997",
-        "罪案",
-        "碎尸",
-        "追凶"
+        "Z世代",
+        "重生",
+        "娱乐圈",
+        "水军"
+      ]
+    },
+    {
+      "title": "宿命之环",
+      "genre_tags": [
+        "玄幻",
+        "诡秘",
+        "克苏鲁"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "诡秘",
+        "1368",
+        "深红",
+        "宿命"
+      ]
+    },
+    {
+      "title": "我，影帝！",
+      "genre_tags": [
+        "都市",
+        "娱乐圈",
+        "逆袭"
+      ],
+      "protagonist_archetype": "废柴逆袭",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "影帝",
+        "横店",
+        "群演",
+        "体育老师"
+      ]
+    },
+    {
+      "title": "哥布林重度依赖",
+      "genre_tags": [
+        "奇幻",
+        "冒险",
+        "搞笑"
+      ],
+      "protagonist_archetype": "普通人生存",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "哥布林",
+        "冒险者",
+        "赏金",
+        "奇幻"
+      ]
+    },
+    {
+      "title": "从魔法少女开始独断万古",
+      "genre_tags": [
+        "轻小说",
+        "魔法少女",
+        "修真"
+      ],
+      "protagonist_archetype": "天才流",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "魔法少女",
+        "修真",
+        "万古"
       ]
     },
     {
@@ -903,15 +847,47 @@
       "genre_tags": [
         "仙侠",
         "修炼",
-        "争霸"
+        "热血"
       ],
-      "protagonist_archetype": "其他",
+      "protagonist_archetype": "天才流",
       "golden_finger": "无/未提及",
       "world_keywords": [
         "上古",
         "妖族",
-        "神道",
+        "龙族",
         "飞剑"
+      ]
+    },
+    {
+      "title": "龙藏",
+      "genre_tags": [
+        "玄幻",
+        "争霸",
+        "工业"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "龙藏",
+        "征战",
+        "工业化",
+        "玄幻"
+      ]
+    },
+    {
+      "title": "尸祸一六四四",
+      "genre_tags": [
+        "历史",
+        "末世",
+        "明末"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "明末",
+        "尸祸",
+        "崇祯",
+        "穿越"
       ]
     },
     {
@@ -922,12 +898,74 @@
         "成长"
       ],
       "protagonist_archetype": "其他",
-      "golden_finger": "其他",
+      "golden_finger": "无/未提及",
       "world_keywords": [
         "山海",
         "提灯",
         "师徒",
         "皓月"
+      ]
+    },
+    {
+      "title": "多我一个后富怎么了",
+      "genre_tags": [
+        "都市",
+        "商业",
+        "重生"
+      ],
+      "protagonist_archetype": "重生复仇",
+      "golden_finger": "重生知识",
+      "world_keywords": [
+        "2008",
+        "商业",
+        "地产",
+        "创业"
+      ]
+    },
+    {
+      "title": "我能活化技能",
+      "genre_tags": [
+        "玄幻",
+        "灵气复苏",
+        "系统流"
+      ],
+      "protagonist_archetype": "天才流",
+      "golden_finger": "系统",
+      "world_keywords": [
+        "灵气复苏",
+        "异界降临",
+        "技能",
+        "天命之子"
+      ]
+    },
+    {
+      "title": "《神的模仿犯》",
+      "genre_tags": [
+        "悬疑",
+        "无限流",
+        "游戏"
+      ],
+      "protagonist_archetype": "普通人生存",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "新世界",
+        "生死游戏",
+        "投票"
+      ]
+    },
+    {
+      "title": "《巫师：从合成宝石开始》",
+      "genre_tags": [
+        "穿越",
+        "修炼",
+        "巫师流"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "巫师世界",
+        "资源",
+        "真理"
       ]
     },
     {
@@ -940,8 +978,217 @@
       "golden_finger": "无/未提及",
       "world_keywords": [
         "武侠",
-        "江湖",
-        "剑道"
+        "剑"
+      ]
+    },
+    {
+      "title": "《1997：罪案追凶》",
+      "genre_tags": [
+        "重生",
+        "悬疑",
+        "罪案"
+      ],
+      "protagonist_archetype": "重生复仇",
+      "golden_finger": "重生知识",
+      "world_keywords": [
+        "1997年",
+        "碎尸案",
+        "追凶"
+      ]
+    },
+    {
+      "title": "《呢喃诗章》",
+      "genre_tags": [
+        "穿越",
+        "蒸汽朋克",
+        "诡秘"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "蒸汽工业",
+        "王国首都",
+        "呢喃之语"
+      ]
+    },
+    {
+      "title": "《战锤：群星与蝼蚁》",
+      "genre_tags": [
+        "星际",
+        "战锤",
+        "无敌流"
+      ],
+      "protagonist_archetype": "无敌流",
+      "golden_finger": "特殊血脉/体质",
+      "world_keywords": [
+        "帝皇",
+        "原体",
+        "帝国"
+      ]
+    },
+    {
+      "title": "《东京医途》",
+      "genre_tags": [
+        "重生",
+        "都市",
+        "医生"
+      ],
+      "protagonist_archetype": "重生复仇",
+      "golden_finger": "重生知识",
+      "world_keywords": [
+        "东京",
+        "平行时空",
+        "医学"
+      ]
+    },
+    {
+      "title": "《重生08，我被确诊为医学泰斗》",
+      "genre_tags": [
+        "重生",
+        "都市",
+        "医生"
+      ],
+      "protagonist_archetype": "重生复仇",
+      "golden_finger": "重生知识",
+      "world_keywords": [
+        "2008年",
+        "医学",
+        "癌症"
+      ]
+    },
+    {
+      "title": "《堑壕大栓与魔法》",
+      "genre_tags": [
+        "穿越",
+        "科幻",
+        "战争"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "战俘",
+        "一战",
+        "魔法"
+      ]
+    },
+    {
+      "title": "《末日边缘》",
+      "genre_tags": [
+        "重生",
+        "末世",
+        "生存"
+      ],
+      "protagonist_archetype": "重生复仇",
+      "golden_finger": "重生知识",
+      "world_keywords": [
+        "末世",
+        "重生",
+        "生存"
+      ]
+    },
+    {
+      "title": "《我在美国搞内战》",
+      "genre_tags": [
+        "穿越",
+        "系统流",
+        "都市"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "系统",
+      "world_keywords": [
+        "美利坚",
+        "地下城",
+        "冒险者"
+      ]
+    },
+    {
+      "title": "《日本战国：功名十字路》",
+      "genre_tags": [
+        "历史",
+        "权谋",
+        "争霸"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "日本战国",
+        "山内一丰",
+        "功名"
+      ]
+    },
+    {
+      "title": "《流窜诸天的灾厄》",
+      "genre_tags": [
+        "诸天无限",
+        "系统流",
+        "无敌流"
+      ],
+      "protagonist_archetype": "无敌流",
+      "golden_finger": "系统",
+      "world_keywords": [
+        "诸天",
+        "天启四骑士",
+        "灾厄"
+      ]
+    },
+    {
+      "title": "《蜀山镇世地仙》",
+      "genre_tags": [
+        "仙侠",
+        "修炼",
+        "宗门"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "传承/老爷爷",
+      "world_keywords": [
+        "蜀山",
+        "道门",
+        "地仙"
+      ]
+    },
+    {
+      "title": "《草芥称王》",
+      "genre_tags": [
+        "历史",
+        "权谋",
+        "宫斗"
+      ],
+      "protagonist_archetype": "扮猪吃虎",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "师爷",
+        "联姻",
+        "替身"
+      ]
+    },
+    {
+      "title": "《仙朝鹰犬》",
+      "genre_tags": [
+        "玄幻",
+        "权谋",
+        "修炼"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "仙朝",
+        "盛世",
+        "神魔"
+      ]
+    },
+    {
+      "title": "《仙业》",
+      "genre_tags": [
+        "仙侠",
+        "修炼",
+        "宗门"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "九州四海",
+        "玄宗魔门",
+        "炼炁"
       ]
     },
     {
@@ -956,52 +1203,7 @@
       "world_keywords": [
         "游戏王",
         "打牌",
-        "穿越"
-      ]
-    },
-    {
-      "title": "《开局相亲女神捕，获独孤九剑》",
-      "genre_tags": [
-        "穿越",
-        "武侠",
-        "系统流"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "系统",
-      "world_keywords": [
-        "武侠",
-        "相亲",
-        "武林绝学"
-      ]
-    },
-    {
-      "title": "《神的模仿犯》",
-      "genre_tags": [
-        "悬疑",
-        "无限流",
-        "游戏"
-      ],
-      "protagonist_archetype": "普通人生存",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "生死游戏",
-        "投票",
-        "新世界"
-      ]
-    },
-    {
-      "title": "《我在美国搞内战》",
-      "genre_tags": [
-        "穿越",
-        "系统流",
-        "都市"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "系统",
-      "world_keywords": [
-        "美利坚",
-        "流浪汉",
-        "地下城"
+        "世界第一"
       ]
     },
     {
@@ -1020,123 +1222,248 @@
       ]
     },
     {
-      "title": "《末日边缘》",
+      "title": "《我真没想重生啊》",
       "genre_tags": [
-        "末世",
         "重生",
-        "科幻"
+        "都市",
+        "恋爱"
       ],
       "protagonist_archetype": "重生复仇",
       "golden_finger": "重生知识",
       "world_keywords": [
-        "末世",
         "重生",
-        "生存"
+        "高三",
+        "选择"
       ]
     },
     {
-      "title": "《哥布林重度依赖》",
-      "genre_tags": [
-        "奇幻",
-        "冒险",
-        "搞笑"
-      ],
-      "protagonist_archetype": "普通人生存",
-      "golden_finger": "无/未提及",
-      "world_keywords": [
-        "冒险者",
-        "哥布林",
-        "赏金"
-      ]
-    },
-    {
-      "title": "《大宋文豪》",
-      "genre_tags": [
-        "历史",
-        "穿越",
-        "文豪"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "大宋",
-        "文学",
-        "嘉祐"
-      ]
-    },
-    {
-      "title": "《仙朝鹰犬》",
+      "title": "《从效法万妖开始成就真仙》",
       "genre_tags": [
         "玄幻",
-        "权谋",
-        "修炼"
+        "修炼",
+        "妖"
       ],
-      "protagonist_archetype": "其他",
+      "protagonist_archetype": "废柴逆袭",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "妖魔",
+        "仙法",
+        "真仙"
+      ]
+    },
+    {
+      "title": "《邪修天王》",
+      "genre_tags": [
+        "仙侠",
+        "修炼",
+        "邪修"
+      ],
+      "protagonist_archetype": "天才流",
       "golden_finger": "特殊血脉/体质",
       "world_keywords": [
-        "仙朝",
-        "天赋神通",
-        "妖孽"
+        "邪修",
+        "天命",
+        "大道"
       ]
     },
     {
-      "title": "《重生08，我被确诊为医学泰斗》",
+      "title": "《开局相亲女神捕，获独孤九剑》",
+      "genre_tags": [
+        "穿越",
+        "系统流",
+        "武侠"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "系统",
+      "world_keywords": [
+        "武侠",
+        "相亲",
+        "独孤九剑"
+      ]
+    },
+    {
+      "title": "《魔王大人深不可测》",
+      "genre_tags": [
+        "轻小说",
+        "无敌流",
+        "搞笑"
+      ],
+      "protagonist_archetype": "无敌流",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "魔王",
+        "魅魔",
+        "市中心"
+      ]
+    },
+    {
+      "title": "《1996：从行政总厨开始》",
       "genre_tags": [
         "重生",
         "都市",
-        "职业"
+        "美食"
       ],
       "protagonist_archetype": "重生复仇",
       "golden_finger": "重生知识",
       "world_keywords": [
-        "医学",
-        "2008",
-        "癌症"
+        "1996年",
+        "厨师",
+        "美食"
       ]
     },
     {
-      "title": "《东京1991，从银行职员开始》",
+      "title": "《我在1984当祥子》",
       "genre_tags": [
-        "重生",
+        "穿越",
         "都市",
-        "平行时空"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "东京",
-        "银行",
-        "命运分支"
-      ]
-    },
-    {
-      "title": "《神话版三国》",
-      "genre_tags": [
-        "历史",
-        "神话",
-        "三国"
+        "年代文"
       ],
       "protagonist_archetype": "穿越者",
       "golden_finger": "其他",
       "world_keywords": [
-        "三国",
-        "神话",
-        "吕布"
+        "1984年",
+        "出租车司机",
+        "祥子"
       ]
     },
     {
-      "title": "《我能活化技能》",
+      "title": "《我的民俗游戏机》",
       "genre_tags": [
         "玄幻",
-        "灵气复苏",
-        "系统流"
+        "游戏",
+        "民俗"
+      ],
+      "protagonist_archetype": "普通人生存",
+      "golden_finger": "系统",
+      "world_keywords": [
+        "游戏机",
+        "民俗",
+        "命运"
+      ]
+    },
+    {
+      "title": "《江左伪郎》",
+      "genre_tags": [
+        "历史",
+        "权谋",
+        "乱世"
+      ],
+      "protagonist_archetype": "扮猪吃虎",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "五胡乱华",
+        "衣冠南渡",
+        "小奴"
+      ]
+    },
+    {
+      "title": "《轮回乐园》",
+      "genre_tags": [
+        "无限流",
+        "系统流",
+        "战斗"
+      ],
+      "protagonist_archetype": "普通人生存",
+      "golden_finger": "系统",
+      "world_keywords": [
+        "轮回契约",
+        "世界任务",
+        "暗鸦"
+      ]
+    },
+    {
+      "title": "《阵问长生》",
+      "genre_tags": [
+        "仙侠",
+        "修炼",
+        "阵法"
+      ],
+      "protagonist_archetype": "天才流",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "阵法",
+        "神识",
+        "飞仙"
+      ]
+    },
+    {
+      "title": "《大赤仙门》",
+      "genre_tags": [
+        "穿越",
+        "修炼",
+        "宗门"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "传承/老爷爷",
+      "world_keywords": [
+        "修真",
+        "宗门",
+        "金丹",
+        "元婴",
+        "仙山"
+      ]
+    },
+    {
+      "title": "《完美人生，从改变时间线开始》",
+      "genre_tags": [
+        "重生",
+        "都市",
+        "文娱"
+      ],
+      "protagonist_archetype": "重生复仇",
+      "golden_finger": "重生知识",
+      "world_keywords": [
+        "记者",
+        "彩票",
+        "2001年",
+        "文娱"
+      ]
+    },
+    {
+      "title": "《仙工开物》",
+      "genre_tags": [
+        "仙侠",
+        "机关",
+        "传承"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "传承/老爷爷",
+      "world_keywords": [
+        "机关",
+        "仙宫",
+        "仙侠",
+        "宝印"
+      ]
+    },
+    {
+      "title": "《仙人消失之后》",
+      "genre_tags": [
+        "仙侠",
+        "剧情流",
+        "无系统"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "无/未提及",
+      "world_keywords": [
+        "天魔",
+        "仙人",
+        "人间",
+        "三千年前"
+      ]
+    },
+    {
+      "title": "《是，伟大魔女2077》",
+      "genre_tags": [
+        "轻小说",
+        "魔女",
+        "家庭"
       ],
       "protagonist_archetype": "其他",
       "golden_finger": "其他",
       "world_keywords": [
-        "灵气复苏",
-        "异界降临",
-        "天命之子"
+        "魔女",
+        "2077",
+        "女儿"
       ]
     },
     {
@@ -1149,174 +1476,280 @@
       "protagonist_archetype": "普通人生存",
       "golden_finger": "其他",
       "world_keywords": [
+        "江城",
+        "大雨",
         "现实",
-        "编程",
-        "大雨"
+        "不对劲"
       ]
     },
     {
-      "title": "《魔王大人深不可测》",
-      "genre_tags": [
-        "轻小说",
-        "搞笑",
-        "奇幻"
-      ],
-      "protagonist_archetype": "无敌流",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "魔王",
-        "魅魔",
-        "敌人"
-      ]
-    },
-    {
-      "title": "《草芥称王》",
+      "title": "《大宋文豪》",
       "genre_tags": [
         "历史",
-        "权谋",
-        "宫斗"
+        "穿越",
+        "文豪"
       ],
-      "protagonist_archetype": "扮猪吃虎",
-      "golden_finger": "无/未提及",
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "重生知识",
       "world_keywords": [
-        "师爷",
-        "新娘",
-        "豪门"
+        "宋朝",
+        "文华",
+        "嘉祐",
+        "文豪"
       ]
     },
     {
-      "title": "《Z世代艺术家》",
+      "title": "《华娱：重生了，还逼我做渣男啊》",
       "genre_tags": [
-        "重生",
         "都市",
-        "娱乐圈"
+        "重生",
+        "华娱"
       ],
       "protagonist_archetype": "重生复仇",
       "golden_finger": "重生知识",
       "world_keywords": [
-        "Z世代",
-        "娱乐圈",
-        "1998"
+        "华娱",
+        "网红",
+        "演员",
+        "重生"
       ]
     },
     {
-      "title": "《巫师：从合成宝石开始》",
+      "title": "《东京1991，从银行职员开始》",
+      "genre_tags": [
+        "轻小说",
+        "重生",
+        "都市"
+      ],
+      "protagonist_archetype": "重生复仇",
+      "golden_finger": "重生知识",
+      "world_keywords": [
+        "东京",
+        "银行",
+        "1991",
+        "命运分支"
+      ]
+    },
+    {
+      "title": "《天下无敌！》",
       "genre_tags": [
         "玄幻",
-        "巫师",
-        "穿越"
+        "无敌流",
+        "修炼"
+      ],
+      "protagonist_archetype": "无敌流",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "强",
+        "迫害",
+        "压榨",
+        "修炼"
+      ]
+    },
+    {
+      "title": "《噩梦使徒》",
+      "genre_tags": [
+        "悬疑",
+        "灵异",
+        "都市"
+      ],
+      "protagonist_archetype": "普通人生存",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "噩梦",
+        "医院",
+        "劫持",
+        "电话"
+      ]
+    },
+    {
+      "title": "《东京：从租借男友开始当完美男神》",
+      "genre_tags": [
+        "轻小说",
+        "重生",
+        "都市"
+      ],
+      "protagonist_archetype": "重生复仇",
+      "golden_finger": "重生知识",
+      "world_keywords": [
+        "东京",
+        "租借男友",
+        "男神",
+        "重生"
+      ]
+    },
+    {
+      "title": "《状元郎》",
+      "genre_tags": [
+        "历史",
+        "权谋",
+        "科举"
+      ],
+      "protagonist_archetype": "天才流",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "状元",
+        "朝堂",
+        "唐寅",
+        "王守仁"
+      ]
+    },
+    {
+      "title": "《整座大山都是我的猎场》",
+      "genre_tags": [
+        "都市",
+        "重生",
+        "种田"
+      ],
+      "protagonist_archetype": "重生复仇",
+      "golden_finger": "重生知识",
+      "world_keywords": [
+        "1986",
+        "猎场",
+        "黑熊",
+        "野猪"
+      ]
+    },
+    {
+      "title": "《战锤：我也要坐黄金王座吗？》",
+      "genre_tags": [
+        "轻小说",
+        "穿越",
+        "同人"
       ],
       "protagonist_archetype": "穿越者",
       "golden_finger": "其他",
       "world_keywords": [
-        "巫师",
-        "宝石",
-        "资源"
+        "战锤",
+        "黄金王座",
+        "穿越"
+      ]
+    },
+    {
+      "title": "《公若不弃，愿拜为义父》",
+      "genre_tags": [
+        "仙侠",
+        "洪荒",
+        "志怪"
+      ],
+      "protagonist_archetype": "其他",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "洪荒",
+        "封神",
+        "西游",
+        "仙狐"
+      ]
+    },
+    {
+      "title": "《谁说我做的魔法卡牌有问题？》",
+      "genre_tags": [
+        "轻小说",
+        "穿越",
+        "游戏"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "魔法卡牌",
+        "卡牌店",
+        "蓝星"
       ]
     },
     {
       "title": "《绍宋》",
       "genre_tags": [
         "历史",
-        "宋朝",
-        "权谋"
+        "权谋",
+        "朝堂"
       ],
       "protagonist_archetype": "其他",
       "golden_finger": "无/未提及",
       "world_keywords": [
         "南宋",
         "赵构",
-        "建炎"
+        "建炎",
+        "北宋灭亡"
       ]
     },
     {
-      "title": "《仙工开物》",
+      "title": "《从大学球探开始》",
       "genre_tags": [
-        "仙侠",
-        "机关",
-        "传承"
+        "体育",
+        "篮球",
+        "都市"
       ],
-      "protagonist_archetype": "废柴逆袭",
-      "golden_finger": "传承/老爷爷",
+      "protagonist_archetype": "普通人生存",
+      "golden_finger": "重生知识",
       "world_keywords": [
-        "仙宫",
-        "机关",
-        "佛心魔印"
+        "篮球",
+        "球探",
+        "巨星",
+        "未来"
       ]
     },
     {
-      "title": "《我在1984当祥子》",
+      "title": "《绝对之门》",
       "genre_tags": [
-        "穿越",
         "都市",
-        "年代"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "无/未提及",
-      "world_keywords": [
-        "1984",
-        "出租车司机",
-        "北京"
-      ]
-    },
-    {
-      "title": "《堑壕大栓与魔法》",
-      "genre_tags": [
         "科幻",
-        "魔法",
-        "战争"
+        "末世"
       ],
       "protagonist_archetype": "普通人生存",
       "golden_finger": "其他",
       "world_keywords": [
-        "战俘",
-        "一战",
-        "魔法"
+        "梦",
+        "天门",
+        "维度",
+        "末日"
       ]
     },
     {
-      "title": "《多我一个后富怎么了》",
+      "title": "《在美漫当心灵导师的日子》",
       "genre_tags": [
-        "都市",
-        "重生",
-        "商业"
+        "轻小说",
+        "穿越",
+        "美漫"
+      ],
+      "protagonist_archetype": "穿越者",
+      "golden_finger": "其他",
+      "world_keywords": [
+        "美漫",
+        "九头蛇",
+        "复仇者",
+        "蝙蝠侠"
+      ]
+    },
+    {
+      "title": "《重生97，我在市局破悬案》",
+      "genre_tags": [
+        "悬疑",
+        "灵异",
+        "重生"
       ],
       "protagonist_archetype": "重生复仇",
       "golden_finger": "重生知识",
       "world_keywords": [
-        "2008",
-        "商业",
-        "地产"
+        "1997",
+        "警局",
+        "悬案",
+        "碎尸案"
       ]
     },
     {
-      "title": "《东京：从租借男友开始当完美男神》",
+      "title": "《明日之神》",
       "genre_tags": [
-        "重生",
-        "都市",
-        "恋爱"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "东京",
-        "租借男友",
-        "男神"
-      ]
-    },
-    {
-      "title": "《谁把遗言落这了？》",
-      "genre_tags": [
-        "奇幻",
-        "悬疑",
-        "神话"
+        "轻小说",
+        "信仰",
+        "神"
       ],
       "protagonist_archetype": "其他",
       "golden_finger": "其他",
       "world_keywords": [
-        "远征",
-        "十二主神",
-        "金羊毛"
+        "灯神",
+        "愿望",
+        "神",
+        "信徒"
       ]
     },
     {
@@ -1324,582 +1757,189 @@
       "genre_tags": [
         "轻小说",
         "恋爱",
-        "科幻"
+        "未来"
       ],
       "protagonist_archetype": "其他",
       "golden_finger": "其他",
       "world_keywords": [
         "未来日记",
         "心声",
-        "灵魂交换"
+        "灵魂交换",
+        "离婚"
       ]
     },
     {
-      "title": "《邪修天王》",
+      "title": "《谁把遗言落这了？》",
       "genre_tags": [
-        "仙侠",
-        "修炼",
-        "邪修"
-      ],
-      "protagonist_archetype": "废柴逆袭",
-      "golden_finger": "特殊血脉/体质",
-      "world_keywords": [
-        "天命",
-        "因果",
-        "邪修"
-      ]
-    },
-    {
-      "title": "《噩梦使徒》",
-      "genre_tags": [
-        "悬疑灵异",
-        "都市",
-        "惊悚"
-      ],
-      "protagonist_archetype": "普通人生存",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "噩梦",
-        "医院",
-        "恶性事件"
-      ]
-    },
-    {
-      "title": "《嗣皇帝》",
-      "genre_tags": [
-        "历史",
-        "权谋",
-        "宫斗"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "九龙夺嫡",
-        "太子",
-        "平行世界"
-      ]
-    },
-    {
-      "title": "刚准备高考，离婚逆袭系统来了",
-      "genre_tags": [
-        "系统流",
-        "校园",
-        "都市"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "系统",
-      "world_keywords": [
-        "高考",
-        "校园",
-        "系统"
-      ]
-    },
-    {
-      "title": "整座大山都是我的猎场",
-      "genre_tags": [
-        "重生",
-        "种田",
-        "都市"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "1986年",
-        "狩猎",
-        "乡村"
-      ]
-    },
-    {
-      "title": "华娱：顶流没有假期",
-      "genre_tags": [
-        "重生",
-        "娱乐圈",
-        "都市"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "2016年",
-        "娱乐圈",
-        "金融"
-      ]
-    },
-    {
-      "title": "呢喃诗章",
-      "genre_tags": [
-        "穿越",
-        "蒸汽朋克",
-        "悬疑"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "蒸汽工业",
-        "王国首都",
-        "诡秘"
-      ]
-    },
-    {
-      "title": "大赤仙门",
-      "genre_tags": [
-        "穿越",
-        "宗门",
-        "修炼"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "传承/老爷爷",
-      "world_keywords": [
-        "仙门",
-        "掌门",
-        "修真"
-      ]
-    },
-    {
-      "title": "重生97，我在市局破悬案",
-      "genre_tags": [
-        "重生",
+        "奇幻",
         "悬疑",
-        "灵异"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "1997年",
-        "警局",
-        "悬案"
-      ]
-    },
-    {
-      "title": "仙业",
-      "genre_tags": [
-        "修炼",
-        "仙侠"
+        "史诗"
       ],
       "protagonist_archetype": "其他",
-      "golden_finger": "无/未提及",
-      "world_keywords": [
-        "九州四海",
-        "玄宗魔门",
-        "炼炁"
-      ]
-    },
-    {
-      "title": "阵问长生",
-      "genre_tags": [
-        "修炼",
-        "阵法",
-        "仙侠"
-      ],
-      "protagonist_archetype": "天才流",
       "golden_finger": "其他",
       "world_keywords": [
-        "阵法",
-        "神识",
-        "仙阵"
+        "远征",
+        "金羊毛",
+        "神",
+        "晨星"
       ]
     },
     {
-      "title": "宇智波赤石之旅",
+      "title": "《倚天崆峒掌派人》",
       "genre_tags": [
-        "同人",
+        "武侠",
         "穿越",
-        "火影"
+        "江湖"
       ],
       "protagonist_archetype": "穿越者",
       "golden_finger": "其他",
       "world_keywords": [
-        "宇智波",
-        "忍者",
-        "木叶"
+        "倚天",
+        "崆峒",
+        "江湖",
+        "屠龙"
       ]
     },
     {
-      "title": "天下无敌！",
-      "genre_tags": [
-        "无敌流",
-        "玄幻"
-      ],
-      "protagonist_archetype": "无敌流",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "强者",
-        "压迫",
-        "修炼"
-      ]
-    },
-    {
-      "title": "日本战国：功名十字路",
+      "title": "《五代风华》",
       "genre_tags": [
         "历史",
-        "权谋",
-        "穿越"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "日本战国",
-        "山内一丰",
-        "功名"
-      ]
-    },
-    {
-      "title": "从效法万妖开始成就真仙",
-      "genre_tags": [
-        "修炼",
-        "玄幻"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "妖魔",
-        "仙法",
-        "红尘"
-      ]
-    },
-    {
-      "title": "江左伪郎",
-      "genre_tags": [
-        "历史",
-        "权谋",
-        "穿越"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "五胡乱华",
-        "衣冠南渡",
-        "东晋"
-      ]
-    },
-    {
-      "title": "轮回乐园",
-      "genre_tags": [
-        "无限流",
-        "游戏",
-        "悬疑"
-      ],
-      "protagonist_archetype": "普通人生存",
-      "golden_finger": "系统",
-      "world_keywords": [
-        "轮回契约",
-        "世界任务",
-        "暗鸦"
-      ]
-    },
-    {
-      "title": "流窜诸天的灾厄",
-      "genre_tags": [
-        "诸天无限",
-        "系统流"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "系统",
-      "world_keywords": [
-        "诸天",
-        "天启四骑士",
-        "灾厄"
-      ]
-    },
-    {
-      "title": "科技入侵现代",
-      "genre_tags": [
         "穿越",
-        "科技",
-        "科幻"
+        "权谋"
       ],
       "protagonist_archetype": "穿越者",
       "golden_finger": "其他",
       "world_keywords": [
-        "1960年",
-        "纽约",
-        "科技数据"
+        "五代",
+        "王朝",
+        "布衣",
+        "黄袍"
       ]
     },
     {
-      "title": "1996：从行政总厨开始",
+      "title": "《废土边境检查官》",
       "genre_tags": [
-        "重生",
-        "美食",
-        "年代文"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "1996年",
-        "厨师",
-        "美食"
-      ]
-    },
-    {
-      "title": "仙人消失之后",
-      "genre_tags": [
-        "仙侠",
-        "剧情流"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "无/未提及",
-      "world_keywords": [
-        "天魔",
-        "仙人",
-        "人间"
-      ]
-    },
-    {
-      "title": "在美漫当心灵导师的日子",
-      "genre_tags": [
-        "穿越",
-        "美漫",
-        "同人"
+        "科幻",
+        "末世",
+        "废土"
       ],
       "protagonist_archetype": "穿越者",
       "golden_finger": "其他",
       "world_keywords": [
-        "美漫",
-        "复仇者联盟",
-        "心理医生"
+        "废土",
+        "感染体",
+        "边境",
+        "幸存者"
       ]
     },
     {
-      "title": "西游：拦路人！",
-      "genre_tags": [
-        "穿越",
-        "系统流",
-        "西游"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "系统",
-      "world_keywords": [
-        "西游",
-        "唐僧",
-        "取经"
-      ]
-    },
-    {
-      "title": "神秘复苏",
+      "title": "《神秘复苏》",
       "genre_tags": [
         "悬疑",
         "灵异",
-        "末世"
+        "都市"
       ],
       "protagonist_archetype": "普通人生存",
       "golden_finger": "其他",
       "world_keywords": [
         "羊皮卷",
-        "黑暗",
-        "存活"
+        "眼睛",
+        "诡异",
+        "活下来"
       ]
     },
     {
-      "title": "完美人生，从改变时间线开始",
-      "genre_tags": [
-        "重生",
-        "都市",
-        "系统流"
-      ],
-      "protagonist_archetype": "重生复仇",
-      "golden_finger": "重生知识",
-      "world_keywords": [
-        "2001年",
-        "彩票",
-        "记者"
-      ]
-    },
-    {
-      "title": "升格耀变体",
-      "genre_tags": [
-        "游戏",
-        "穿越",
-        "科幻"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "游戏世界",
-        "冷战",
-        "两极争霸"
-      ]
-    },
-    {
-      "title": "状元郎",
-      "genre_tags": [
-        "历史",
-        "权谋",
-        "穿越"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "明朝",
-        "唐寅",
-        "王守仁"
-      ]
-    },
-    {
-      "title": "匹夫有责",
-      "genre_tags": [
-        "历史",
-        "权谋",
-        "穿越"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "崇祯",
-        "明末",
-        "红夷大炮"
-      ]
-    },
-    {
-      "title": "五代风华",
-      "genre_tags": [
-        "历史",
-        "权谋",
-        "穿越"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "五代十国",
-        "王朝更迭",
-        "布衣"
-      ]
-    },
-    {
-      "title": "天人图谱",
-      "genre_tags": [
-        "玄幻",
-        "修炼"
-      ],
-      "protagonist_archetype": "其他",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "人类",
-        "强大",
-        "天"
-      ]
-    },
-    {
-      "title": "诸天：一切从拜师石坚开始！",
-      "genre_tags": [
-        "诸天无限",
-        "穿越",
-        "僵尸"
-      ],
-      "protagonist_archetype": "穿越者",
-      "golden_finger": "传承/老爷爷",
-      "world_keywords": [
-        "茅山",
-        "石坚",
-        "符道"
-      ]
-    },
-    {
-      "title": "腐朽世界",
-      "genre_tags": [
-        "玄幻",
-        "末世",
-        "悬疑"
-      ],
-      "protagonist_archetype": "普通人生存",
-      "golden_finger": "其他",
-      "world_keywords": [
-        "末路世界",
-        "危机",
-        "绝望"
-      ]
-    },
-    {
-      "title": "是，伟大魔女2077",
+      "title": "《作家手册》",
       "genre_tags": [
         "轻小说",
-        "魔法",
-        "日常"
+        "都市",
+        "文娱"
       ],
       "protagonist_archetype": "其他",
       "golden_finger": "其他",
       "world_keywords": [
-        "魔女",
-        "女儿",
-        "2077"
+        "作家",
+        "后宫文",
+        "现实"
       ]
     }
   ],
   "aggregations": {
     "top_genre_tags": [
       {
-        "tag": "穿越",
-        "count": 32
-      },
-      {
         "tag": "都市",
-        "count": 25
+        "count": 30
       },
       {
-        "tag": "重生",
-        "count": 19
-      },
-      {
-        "tag": "玄幻",
-        "count": 16
-      },
-      {
-        "tag": "历史",
-        "count": 16
-      },
-      {
-        "tag": "权谋",
-        "count": 15
-      },
-      {
-        "tag": "悬疑",
-        "count": 14
-      },
-      {
-        "tag": "仙侠",
-        "count": 14
+        "tag": "穿越",
+        "count": 23
       },
       {
         "tag": "轻小说",
-        "count": 14
+        "count": 22
+      },
+      {
+        "tag": "玄幻",
+        "count": 19
+      },
+      {
+        "tag": "仙侠",
+        "count": 16
+      },
+      {
+        "tag": "重生",
+        "count": 16
       },
       {
         "tag": "修炼",
-        "count": 13
+        "count": 15
       },
       {
-        "tag": "系统流",
+        "tag": "历史",
+        "count": 14
+      },
+      {
+        "tag": "权谋",
+        "count": 12
+      },
+      {
+        "tag": "悬疑",
         "count": 11
       },
       {
-        "tag": "科幻",
-        "count": 10
-      },
-      {
         "tag": "末世",
-        "count": 7
+        "count": 8
       },
       {
-        "tag": "种田",
-        "count": 5
-      },
-      {
-        "tag": "争霸",
-        "count": 5
-      },
-      {
-        "tag": "奇幻",
-        "count": 5
-      },
-      {
-        "tag": "搞笑",
-        "count": 5
-      },
-      {
-        "tag": "灵异",
-        "count": 4
+        "tag": "系统流",
+        "count": 8
       },
       {
         "tag": "无敌流",
+        "count": 7
+      },
+      {
+        "tag": "搞笑",
+        "count": 7
+      },
+      {
+        "tag": "科幻",
+        "count": 6
+      },
+      {
+        "tag": "灵异",
+        "count": 5
+      },
+      {
+        "tag": "种田",
+        "count": 4
+      },
+      {
+        "tag": "武侠",
+        "count": 4
+      },
+      {
+        "tag": "争霸",
         "count": 4
       },
       {
@@ -1907,11 +1947,19 @@
         "count": 4
       },
       {
+        "tag": "恋爱",
+        "count": 4
+      },
+      {
         "tag": "日常",
         "count": 4
       },
       {
-        "tag": "恋爱",
+        "tag": "奇幻",
+        "count": 4
+      },
+      {
+        "tag": "朝堂",
         "count": 4
       },
       {
@@ -1923,15 +1971,11 @@
         "count": 3
       },
       {
-        "tag": "异能",
+        "tag": "蒸汽朋克",
         "count": 3
       },
       {
-        "tag": "灵气复苏",
-        "count": 3
-      },
-      {
-        "tag": "武侠",
+        "tag": "娱乐圈",
         "count": 3
       },
       {
@@ -1939,42 +1983,38 @@
         "count": 3
       },
       {
-        "tag": "宫斗",
-        "count": 3
-      },
-      {
-        "tag": "同人",
+        "tag": "宗门",
         "count": 3
       }
     ],
     "archetype_distribution": [
       {
         "type": "其他",
-        "count": 41
+        "count": 40
       },
       {
         "type": "穿越者",
-        "count": 33
+        "count": 28
       },
       {
         "type": "重生复仇",
-        "count": 20
+        "count": 17
       },
       {
         "type": "普通人生存",
-        "count": 12
-      },
-      {
-        "type": "废柴逆袭",
-        "count": 5
+        "count": 13
       },
       {
         "type": "天才流",
-        "count": 3
+        "count": 8
       },
       {
         "type": "无敌流",
-        "count": 3
+        "count": 6
+      },
+      {
+        "type": "废柴逆袭",
+        "count": 4
       },
       {
         "type": "苟道稳健",
@@ -1982,17 +2022,17 @@
       },
       {
         "type": "扮猪吃虎",
-        "count": 1
+        "count": 2
       }
     ],
     "golden_finger_distribution": [
       {
         "type": "其他",
-        "count": 56
+        "count": 43
       },
       {
         "type": "无/未提及",
-        "count": 23
+        "count": 35
       },
       {
         "type": "重生知识",
@@ -2000,25 +2040,21 @@
       },
       {
         "type": "系统",
-        "count": 10
+        "count": 11
       },
       {
         "type": "传承/老爷爷",
-        "count": 6
+        "count": 7
       },
       {
         "type": "特殊血脉/体质",
-        "count": 6
+        "count": 5
       }
     ],
     "top_world_keywords": [
       {
-        "keyword": "穿越",
-        "count": 8
-      },
-      {
         "keyword": "重生",
-        "count": 5
+        "count": 8
       },
       {
         "keyword": "修仙",
@@ -2029,19 +2065,15 @@
         "count": 4
       },
       {
-        "keyword": "江湖",
-        "count": 3
+        "keyword": "朝堂",
+        "count": 4
       },
       {
-        "keyword": "恋爱",
-        "count": 3
+        "keyword": "穿越",
+        "count": 4
       },
       {
-        "keyword": "高考",
-        "count": 3
-      },
-      {
-        "keyword": "平行世界",
+        "keyword": "仙侠",
         "count": 3
       },
       {
@@ -2049,31 +2081,11 @@
         "count": 2
       },
       {
-        "keyword": "末世",
-        "count": 2
-      },
-      {
-        "keyword": "1984",
-        "count": 2
-      },
-      {
         "keyword": "美食",
         "count": 2
       },
       {
-        "keyword": "种田",
-        "count": 2
-      },
-      {
-        "keyword": "妖兽",
-        "count": 2
-      },
-      {
-        "keyword": "仙门",
-        "count": 2
-      },
-      {
-        "keyword": "龙",
+        "keyword": "江湖",
         "count": 2
       },
       {
@@ -2081,11 +2093,31 @@
         "count": 2
       },
       {
-        "keyword": "黑暗",
+        "keyword": "高考",
+        "count": 2
+      },
+      {
+        "keyword": "美利坚",
+        "count": 2
+      },
+      {
+        "keyword": "校园",
         "count": 2
       },
       {
         "keyword": "魔法",
+        "count": 2
+      },
+      {
+        "keyword": "龙族",
+        "count": 2
+      },
+      {
+        "keyword": "屠龙",
+        "count": 2
+      },
+      {
+        "keyword": "高三",
         "count": 2
       },
       {
@@ -2097,27 +2129,7 @@
         "count": 2
       },
       {
-        "keyword": "美利坚",
-        "count": 2
-      },
-      {
-        "keyword": "仙侠",
-        "count": 2
-      },
-      {
-        "keyword": "校园",
-        "count": 2
-      },
-      {
-        "keyword": "明朝",
-        "count": 2
-      },
-      {
-        "keyword": "诡秘",
-        "count": 2
-      },
-      {
-        "keyword": "超凡",
+        "keyword": "冒险者",
         "count": 2
       },
       {
@@ -2125,12 +2137,40 @@
         "count": 2
       },
       {
-        "keyword": "明末",
+        "keyword": "武侠",
         "count": 2
       },
       {
-        "keyword": "崇祯",
+        "keyword": "碎尸案",
         "count": 2
+      },
+      {
+        "keyword": "医学",
+        "count": 2
+      },
+      {
+        "keyword": "现实",
+        "count": 2
+      },
+      {
+        "keyword": "神",
+        "count": 2
+      },
+      {
+        "keyword": "灵异",
+        "count": 1
+      },
+      {
+        "keyword": "鬼怪",
+        "count": 1
+      },
+      {
+        "keyword": "人心",
+        "count": 1
+      },
+      {
+        "keyword": "铜镜",
+        "count": 1
       }
     ]
   }
