@@ -1,119 +1,133 @@
 {
   "rules": [
     {
+      "antecedent": "hotsales",
+      "consequent": "readindex",
+      "support": 0.1834,
+      "confidence": 0.6889,
+      "lift": 2.5872
+    },
+    {
+      "antecedent": "readindex",
+      "consequent": "hotsales",
+      "support": 0.1834,
+      "confidence": 0.6889,
+      "lift": 2.5872
+    },
+    {
       "antecedent": "yuepiao",
       "consequent": "recom",
-      "support": 0.1432,
+      "support": 0.182,
       "confidence": 0.6833,
-      "lift": 3.261
+      "lift": 2.5663
     },
     {
       "antecedent": "recom",
       "consequent": "yuepiao",
-      "support": 0.1432,
+      "support": 0.182,
       "confidence": 0.6833,
-      "lift": 3.261
-    },
-    {
-      "antecedent": "readindex",
-      "consequent": "hotsales",
-      "support": 0.1362,
-      "confidence": 0.65,
-      "lift": 3.1019
-    },
-    {
-      "antecedent": "hotsales",
-      "consequent": "readindex",
-      "support": 0.1362,
-      "confidence": 0.65,
-      "lift": 3.1019
-    },
-    {
-      "antecedent": "yuepiao",
-      "consequent": "hotsales",
-      "support": 0.135,
-      "confidence": 0.6444,
-      "lift": 3.0754
+      "lift": 2.5663
     },
     {
       "antecedent": "hotsales",
       "consequent": "yuepiao",
-      "support": 0.135,
-      "confidence": 0.6444,
-      "lift": 3.0754
+      "support": 0.1805,
+      "confidence": 0.6778,
+      "lift": 2.5454
     },
     {
       "antecedent": "yuepiao",
-      "consequent": "readindex",
-      "support": 0.1292,
-      "confidence": 0.6167,
-      "lift": 2.9429
+      "consequent": "hotsales",
+      "support": 0.1805,
+      "confidence": 0.6778,
+      "lift": 2.5454
     },
     {
       "antecedent": "readindex",
       "consequent": "yuepiao",
-      "support": 0.1292,
-      "confidence": 0.6167,
-      "lift": 2.9429
+      "support": 0.1701,
+      "confidence": 0.6389,
+      "lift": 2.3994
     },
     {
-      "antecedent": "readindex",
-      "consequent": "newfans",
-      "support": 0.1141,
-      "confidence": 0.5444,
-      "lift": 2.5982
-    },
-    {
-      "antecedent": "newfans",
+      "antecedent": "yuepiao",
       "consequent": "readindex",
-      "support": 0.1141,
-      "confidence": 0.5444,
-      "lift": 2.5982
-    },
-    {
-      "antecedent": "newfans",
-      "consequent": "hotsales",
-      "support": 0.1118,
-      "confidence": 0.5333,
-      "lift": 2.5452
+      "support": 0.1701,
+      "confidence": 0.6389,
+      "lift": 2.3994
     },
     {
       "antecedent": "hotsales",
       "consequent": "newfans",
-      "support": 0.1118,
-      "confidence": 0.5333,
-      "lift": 2.5452
+      "support": 0.1583,
+      "confidence": 0.5944,
+      "lift": 2.2325
+    },
+    {
+      "antecedent": "newfans",
+      "consequent": "hotsales",
+      "support": 0.1583,
+      "confidence": 0.5944,
+      "lift": 2.2325
     },
     {
       "antecedent": "readindex",
-      "consequent": "recom",
-      "support": 0.1071,
-      "confidence": 0.5111,
-      "lift": 2.4391
+      "consequent": "newfans",
+      "support": 0.1538,
+      "confidence": 0.5778,
+      "lift": 2.1699
     },
     {
-      "antecedent": "recom",
+      "antecedent": "newfans",
       "consequent": "readindex",
-      "support": 0.1071,
-      "confidence": 0.5111,
-      "lift": 2.4391
-    },
-    {
-      "antecedent": "recom",
-      "consequent": "hotsales",
-      "support": 0.1059,
-      "confidence": 0.5056,
-      "lift": 2.4126
+      "support": 0.1538,
+      "confidence": 0.5778,
+      "lift": 2.1699
     },
     {
       "antecedent": "hotsales",
       "consequent": "recom",
-      "support": 0.1059,
-      "confidence": 0.5056,
-      "lift": 2.4126
+      "support": 0.145,
+      "confidence": 0.5444,
+      "lift": 2.0447
+    },
+    {
+      "antecedent": "recom",
+      "consequent": "hotsales",
+      "support": 0.145,
+      "confidence": 0.5444,
+      "lift": 2.0447
+    },
+    {
+      "antecedent": "yuepiao",
+      "consequent": "newfans",
+      "support": 0.142,
+      "confidence": 0.5333,
+      "lift": 2.003
+    },
+    {
+      "antecedent": "newfans",
+      "consequent": "yuepiao",
+      "support": 0.142,
+      "confidence": 0.5333,
+      "lift": 2.003
+    },
+    {
+      "antecedent": "readindex",
+      "consequent": "recom",
+      "support": 0.142,
+      "confidence": 0.5333,
+      "lift": 2.003
+    },
+    {
+      "antecedent": "recom",
+      "consequent": "readindex",
+      "support": 0.142,
+      "confidence": 0.5333,
+      "lift": 2.003
     }
   ],
-  "n_transactions": 859,
-  "week": "2026-W37",
-  "updated_at": "2026-09-07T03:08:44.940575"
+  "n_transactions": 676,
+  "week": "2026-W38",
+  "updated_at": "2026-09-14T03:38:22.925083"
 }
