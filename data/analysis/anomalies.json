@@ -1,103 +1,213 @@
 {
   "anomalies": [
     {
+      "title": "西游：拦路人！",
+      "author": "九月病句",
+      "category": "仙侠",
+      "rank_type": "readindex",
+      "prev_rank": 38,
+      "cur_rank": 147,
+      "z_score": -5.16,
+      "direction": "down"
+    },
+    {
+      "title": "词条武圣：从木匠开始肝",
+      "author": "爱空想的观众",
+      "category": "玄幻",
+      "rank_type": "vipup",
+      "prev_rank": 158,
+      "cur_rank": 25,
+      "z_score": 4.88,
+      "direction": "up"
+    },
+    {
+      "title": "龙游令",
+      "author": "鱼狱圄",
+      "category": "玄幻",
+      "rank_type": "readindex",
+      "prev_rank": 42,
+      "cur_rank": 175,
+      "z_score": -4.84,
+      "direction": "down"
+    },
+    {
+      "title": "怪兽收藏家：从迪迦宇宙开始",
+      "author": "嗨笑",
+      "category": "轻小说",
+      "rank_type": "vipup",
+      "prev_rank": 8,
+      "cur_rank": 171,
+      "z_score": -4.75,
+      "direction": "down"
+    },
+    {
+      "title": "每日结算，从杂役开始修仙",
+      "author": "墨子空空",
+      "category": "仙侠",
+      "rank_type": "vipup",
+      "prev_rank": 3,
+      "cur_rank": 102,
+      "z_score": -4.65,
+      "direction": "down"
+    },
+    {
+      "title": "废土边境检查官",
+      "author": "斤斤斤",
+      "category": "科幻",
+      "rank_type": "readindex",
+      "prev_rank": 60,
+      "cur_rank": 136,
+      "z_score": -4.31,
+      "direction": "down"
+    },
+    {
+      "title": "太平天国1854",
+      "author": "两吨晚风",
+      "category": "历史",
+      "rank_type": "vipup",
+      "prev_rank": 46,
+      "cur_rank": 153,
+      "z_score": -4.31,
+      "direction": "down"
+    },
+    {
+      "title": "华娱：顶流没有假期",
+      "author": "顾屈",
+      "category": "都市",
+      "rank_type": "newfans",
+      "prev_rank": 29,
+      "cur_rank": 137,
+      "z_score": -4.12,
+      "direction": "down"
+    },
+    {
+      "title": "大明黑帆",
+      "author": "庆历泗年春",
+      "category": "历史",
+      "rank_type": "hotsales",
+      "prev_rank": 157,
+      "cur_rank": 64,
+      "z_score": 4.02,
+      "direction": "up"
+    },
+    {
+      "title": "从沼泽小狗到鳄祖",
+      "author": "世界的妖魔",
+      "category": "仙侠",
+      "rank_type": "vipup",
+      "prev_rank": 12,
+      "cur_rank": 98,
+      "z_score": -4.0,
+      "direction": "down"
+    },
+    {
+      "title": "只有我家妖怪是轻松明亮的",
+      "author": "拼好茶",
+      "category": "轻小说",
+      "rank_type": "vipup",
+      "prev_rank": 4,
+      "cur_rank": 137,
+      "z_score": -3.86,
+      "direction": "down"
+    },
+    {
+      "title": "遮天：沟通古今，开局拜入兽奶宗",
+      "author": "林昊林昭孰强孰弱",
+      "category": "玄幻",
+      "rank_type": "newfans",
+      "prev_rank": 172,
+      "cur_rank": 70,
+      "z_score": 3.75,
+      "direction": "up"
+    },
+    {
+      "title": "红楼鱼龙传",
+      "author": "尚二郎",
+      "category": "历史",
+      "rank_type": "vipup",
+      "prev_rank": 24,
+      "cur_rank": 117,
+      "z_score": -3.72,
+      "direction": "down"
+    },
+    {
+      "title": "1978：从婴儿开始增加智商",
+      "author": "芹菜之神",
+      "category": "都市",
+      "rank_type": "vipup",
+      "prev_rank": 154,
+      "cur_rank": 66,
+      "z_score": 3.59,
+      "direction": "up"
+    },
+    {
+      "title": "我在迷雾打造完美领地",
+      "author": "一条小白蛇",
+      "category": "游戏",
+      "rank_type": "newfans",
+      "prev_rank": 94,
+      "cur_rank": 177,
+      "z_score": -3.43,
+      "direction": "down"
+    },
+    {
       "title": "我都成超人了，灵气才复苏？",
       "author": "铁掌草上飞",
       "category": "玄幻",
-      "rank_type": "readindex",
-      "prev_rank": 174,
-      "cur_rank": 85,
-      "z_score": 4.14,
-      "direction": "up"
-    },
-    {
-      "title": "神话武装：从天兵开始",
-      "author": "司晨啼晓",
-      "category": "玄幻",
-      "rank_type": "vipup",
-      "prev_rank": 73,
-      "cur_rank": 168,
-      "z_score": -4.07,
-      "direction": "down"
-    },
-    {
-      "title": "混沌天帝诀",
-      "author": "剑轻阳",
-      "category": "玄幻",
-      "rank_type": "vipup",
-      "prev_rank": 74,
-      "cur_rank": 169,
-      "z_score": -4.07,
-      "direction": "down"
-    },
-    {
-      "title": "苟在仙宗打铁，悄悄修成道祖",
-      "author": "会狼叫的猪",
-      "category": "玄幻",
-      "rank_type": "vipup",
-      "prev_rank": 67,
-      "cur_rank": 160,
-      "z_score": -3.98,
-      "direction": "down"
-    },
-    {
-      "title": "我能活化技能",
-      "author": "四诗风雅颂",
-      "category": "玄幻",
-      "rank_type": "vipup",
-      "prev_rank": 82,
-      "cur_rank": 175,
-      "z_score": -3.98,
-      "direction": "down"
-    },
-    {
-      "title": "法师归来，速通地球！",
-      "author": "没想好吃啥",
-      "category": "科幻",
-      "rank_type": "readindex",
-      "prev_rank": 71,
-      "cur_rank": 171,
-      "z_score": -3.98,
-      "direction": "down"
-    },
-    {
-      "title": "遮天，但是女主剧本",
-      "author": "褪色不死人",
-      "category": "玄幻",
-      "rank_type": "vipup",
-      "prev_rank": 33,
-      "cur_rank": 125,
-      "z_score": -3.93,
-      "direction": "down"
-    },
-    {
-      "title": "我有一个修仙模拟器",
-      "author": "不是星期天",
-      "category": "仙侠",
-      "rank_type": "readindex",
-      "prev_rank": 61,
-      "cur_rank": 172,
-      "z_score": -3.92,
-      "direction": "down"
-    },
-    {
-      "title": "阵问长生",
-      "author": "观虚",
-      "category": "仙侠",
-      "rank_type": "hotsales",
-      "prev_rank": 170,
-      "cur_rank": 70,
-      "z_score": 3.84,
-      "direction": "up"
-    },
-    {
-      "title": "请勿高考时渡劫",
-      "author": "最白的乌鸦",
-      "category": "都市",
       "rank_type": "newfans",
-      "prev_rank": 129,
-      "cur_rank": 25,
-      "z_score": 3.78,
+      "prev_rank": 114,
+      "cur_rank": 21,
+      "z_score": 3.42,
+      "direction": "up"
+    },
+    {
+      "title": "苟圣！",
+      "author": "不偷半日闲",
+      "category": "玄幻",
+      "rank_type": "newfans",
+      "prev_rank": 160,
+      "cur_rank": 68,
+      "z_score": 3.38,
+      "direction": "up"
+    },
+    {
+      "title": "苟在两界修仙",
+      "author": "文抄公",
+      "category": "仙侠",
+      "rank_type": "recom",
+      "prev_rank": 10,
+      "cur_rank": 81,
+      "z_score": -3.24,
+      "direction": "down"
+    },
+    {
+      "title": "谁说这里有怪谈的？",
+      "author": "你是不是笨蛋",
+      "category": "悬疑灵异",
+      "rank_type": "hotsales",
+      "prev_rank": 166,
+      "cur_rank": 79,
+      "z_score": 3.16,
+      "direction": "up"
+    },
+    {
+      "title": "圈中之兽",
+      "author": "黑环",
+      "category": "奇幻",
+      "rank_type": "recom",
+      "prev_rank": 147,
+      "cur_rank": 86,
+      "z_score": 3.14,
+      "direction": "up"
+    },
+    {
+      "title": "星河之主",
+      "author": "烽仙",
+      "category": "玄幻",
+      "rank_type": "readindex",
+      "prev_rank": 126,
+      "cur_rank": 42,
+      "z_score": 3.09,
       "direction": "up"
     },
     {
@@ -105,273 +215,183 @@
       "author": "满船轻梦",
       "category": "仙侠",
       "rank_type": "newfans",
-      "prev_rank": 58,
-      "cur_rank": 161,
-      "z_score": -3.63,
-      "direction": "down"
-    },
-    {
-      "title": "在修仙文字游戏里当劫修",
-      "author": "渊妖",
-      "category": "仙侠",
-      "rank_type": "vipup",
-      "prev_rank": 17,
-      "cur_rank": 119,
-      "z_score": -3.59,
-      "direction": "down"
-    },
-    {
-      "title": "玩家们的NPC大爹",
-      "author": "玖武珥绮",
-      "category": "轻小说",
-      "rank_type": "vipup",
-      "prev_rank": 4,
-      "cur_rank": 143,
-      "z_score": -3.5,
-      "direction": "down"
-    },
-    {
-      "title": "我在美国搞内战",
-      "author": "捕梦者",
-      "category": "都市",
-      "rank_type": "hotsales",
-      "prev_rank": 149,
-      "cur_rank": 54,
-      "z_score": 3.45,
-      "direction": "up"
-    },
-    {
-      "title": "我的设定在你之上！",
-      "author": "东山余雨",
-      "category": "奇幻",
-      "rank_type": "newfans",
-      "prev_rank": 155,
-      "cur_rank": 62,
-      "z_score": 3.42,
-      "direction": "up"
-    },
-    {
-      "title": "水浒：风雪山神庙，凭什么我背锅",
-      "author": "隔壁点子大王",
-      "category": "历史",
-      "rank_type": "vipup",
-      "prev_rank": 37,
-      "cur_rank": 128,
-      "z_score": -3.41,
-      "direction": "down"
-    },
-    {
-      "title": "我，影帝！",
-      "author": "江公子阿宝",
-      "category": "都市",
-      "rank_type": "vipup",
-      "prev_rank": 69,
-      "cur_rank": 164,
-      "z_score": -3.37,
-      "direction": "down"
-    },
-    {
-      "title": "长生天阙",
-      "author": "书寒",
-      "category": "仙侠",
-      "rank_type": "vipup",
-      "prev_rank": 76,
-      "cur_rank": 170,
-      "z_score": -3.3,
-      "direction": "down"
-    },
-    {
-      "title": "重燃1983：从赶山开始发家",
-      "author": "一薪壹亿",
-      "category": "都市",
-      "rank_type": "vipup",
-      "prev_rank": 87,
-      "cur_rank": 180,
-      "z_score": -3.3,
-      "direction": "down"
-    },
-    {
-      "title": "文娱帝王",
-      "author": "小刀锋利",
-      "category": "都市",
-      "rank_type": "vipup",
-      "prev_rank": 46,
-      "cur_rank": 138,
-      "z_score": -3.26,
-      "direction": "down"
-    },
-    {
-      "title": "我的民俗游戏机",
-      "author": "夜半探窗",
-      "category": "玄幻",
-      "rank_type": "hotsales",
-      "prev_rank": 123,
-      "cur_rank": 55,
-      "z_score": 3.2,
-      "direction": "up"
-    },
-    {
-      "title": "全人类的继承者",
-      "author": "万里万雪",
-      "category": "轻小说",
-      "rank_type": "newfans",
-      "prev_rank": 14,
-      "cur_rank": 139,
-      "z_score": -3.12,
-      "direction": "down"
-    },
-    {
-      "title": "我的民俗游戏机",
-      "author": "夜半探窗",
-      "category": "玄幻",
-      "rank_type": "newfans",
-      "prev_rank": 89,
-      "cur_rank": 23,
-      "z_score": 3.11,
-      "direction": "up"
-    },
-    {
-      "title": "火德真仙：从六十四卦开始",
-      "author": "云坠小青山",
-      "category": "仙侠",
-      "rank_type": "vipup",
-      "prev_rank": 19,
-      "cur_rank": 108,
-      "z_score": -3.11,
-      "direction": "down"
-    },
-    {
-      "title": "从药馆学徒到长生仙师",
-      "author": "灰鼠指挥官",
-      "category": "仙侠",
-      "rank_type": "vipup",
-      "prev_rank": 27,
-      "cur_rank": 116,
-      "z_score": -3.11,
-      "direction": "down"
-    },
-    {
-      "title": "从捡到富婆开始成为亡灵主宰",
-      "author": "咕嘟猫",
-      "category": "游戏",
-      "rank_type": "vipup",
-      "prev_rank": 79,
-      "cur_rank": 178,
-      "z_score": -3.1,
-      "direction": "down"
-    },
-    {
-      "title": "白马银枪高太尉",
-      "author": "仁者为鬼",
-      "category": "历史",
-      "rank_type": "vipup",
-      "prev_rank": 51,
-      "cur_rank": 133,
-      "z_score": -3.08,
-      "direction": "down"
-    },
-    {
-      "title": "东京：从假冒男友开始",
-      "author": "我的大树出无尽",
-      "category": "轻小说",
-      "rank_type": "readindex",
-      "prev_rank": 11,
-      "cur_rank": 133,
-      "z_score": -3.05,
-      "direction": "down"
-    },
-    {
-      "title": "我能活化技能",
-      "author": "四诗风雅颂",
-      "category": "玄幻",
-      "rank_type": "newfans",
-      "prev_rank": 36,
-      "cur_rank": 108,
-      "z_score": -3.04,
-      "direction": "down"
-    },
-    {
-      "title": "草芥称王",
-      "author": "月关",
-      "category": "历史",
-      "rank_type": "vipup",
-      "prev_rank": 49,
-      "cur_rank": 130,
-      "z_score": -3.04,
-      "direction": "down"
-    },
-    {
-      "title": "江左伪郎",
-      "author": "历史系之狼",
-      "category": "历史",
-      "rank_type": "readindex",
-      "prev_rank": 126,
-      "cur_rank": 45,
-      "z_score": 3.02,
-      "direction": "up"
-    },
-    {
-      "title": "西游：成了方寸山首席",
-      "author": "天地有缺",
-      "category": "仙侠",
-      "rank_type": "newfans",
-      "prev_rank": 72,
-      "cur_rank": 157,
-      "z_score": -2.96,
-      "direction": "down"
-    },
-    {
-      "title": "怪谈1999：头衔收藏家",
-      "author": "空心柴",
-      "category": "都市",
-      "rank_type": "newfans",
-      "prev_rank": 174,
-      "cur_rank": 96,
-      "z_score": 2.84,
-      "direction": "up"
-    },
-    {
-      "title": "尼禄",
-      "author": "九鱼",
-      "category": "奇幻",
-      "rank_type": "newfans",
-      "prev_rank": 61,
-      "cur_rank": 136,
-      "z_score": -2.83,
-      "direction": "down"
-    },
-    {
-      "title": "玄鉴：从魔宗开始当人材",
-      "author": "不更党",
-      "category": "仙侠",
-      "rank_type": "recom",
-      "prev_rank": 12,
-      "cur_rank": 92,
-      "z_score": -2.78,
-      "direction": "down"
-    },
-    {
-      "title": "日本战国：功名十字路",
-      "author": "吉良上总介",
-      "category": "历史",
-      "rank_type": "recom",
-      "prev_rank": 177,
+      "prev_rank": 161,
       "cur_rank": 107,
-      "z_score": 2.61,
+      "z_score": 3.05,
       "direction": "up"
     },
     {
-      "title": "霍格沃茨：马丁的变身每日刷新",
-      "author": "哈利波特红",
-      "category": "轻小说",
-      "rank_type": "vipup",
-      "prev_rank": 2,
-      "cur_rank": 106,
-      "z_score": -2.57,
+      "title": "我，死灵法师，超爱美利坚",
+      "author": "最爱铁板烧",
+      "category": "都市",
+      "rank_type": "newfans",
+      "prev_rank": 100,
+      "cur_rank": 179,
+      "z_score": -2.98,
       "direction": "down"
+    },
+    {
+      "title": "东京：从租借男友开始当完美男神",
+      "author": "圭寸笔",
+      "category": "轻小说",
+      "rank_type": "newfans",
+      "prev_rank": 52,
+      "cur_rank": 154,
+      "z_score": -2.95,
+      "direction": "down"
+    },
+    {
+      "title": "斗罗绝世：我，最后的天灾",
+      "author": "火中寻月",
+      "category": "轻小说",
+      "rank_type": "newfans",
+      "prev_rank": 105,
+      "cur_rank": 8,
+      "z_score": 2.94,
+      "direction": "up"
+    },
+    {
+      "title": "现实编程协会",
+      "author": "木也马",
+      "category": "科幻",
+      "rank_type": "recom",
+      "prev_rank": 68,
+      "cur_rank": 20,
+      "z_score": 2.93,
+      "direction": "up"
+    },
+    {
+      "title": "五代风华",
+      "author": "怪诞的表哥",
+      "category": "历史",
+      "rank_type": "hotsales",
+      "prev_rank": 133,
+      "cur_rank": 67,
+      "z_score": 2.9,
+      "direction": "up"
+    },
+    {
+      "title": "国民律师",
+      "author": "青衫仗剑行天涯",
+      "category": "都市",
+      "rank_type": "readindex",
+      "prev_rank": 132,
+      "cur_rank": 62,
+      "z_score": 2.88,
+      "direction": "up"
+    },
+    {
+      "title": "我真没想重生啊",
+      "author": "柳岸花又明",
+      "category": "都市",
+      "rank_type": "newfans",
+      "prev_rank": 90,
+      "cur_rank": 166,
+      "z_score": -2.86,
+      "direction": "down"
+    },
+    {
+      "title": "影综百世书：从继承十亿改写剧本",
+      "author": "天命人joker",
+      "category": "都市",
+      "rank_type": "newfans",
+      "prev_rank": 48,
+      "cur_rank": 122,
+      "z_score": -2.79,
+      "direction": "down"
+    },
+    {
+      "title": "我的民俗游戏机",
+      "author": "夜半探窗",
+      "category": "玄幻",
+      "rank_type": "hotsales",
+      "prev_rank": 55,
+      "cur_rank": 131,
+      "z_score": -2.76,
+      "direction": "down"
+    },
+    {
+      "title": "你的技能很好，现在我也有了",
+      "author": "明前云雾",
+      "category": "玄幻",
+      "rank_type": "readindex",
+      "prev_rank": 148,
+      "cur_rank": 73,
+      "z_score": 2.76,
+      "direction": "up"
+    },
+    {
+      "title": "百世修长生",
+      "author": "饭不吃肉",
+      "category": "玄幻",
+      "rank_type": "yuepiao",
+      "prev_rank": 160,
+      "cur_rank": 87,
+      "z_score": 2.69,
+      "direction": "up"
+    },
+    {
+      "title": "我的民俗游戏机",
+      "author": "夜半探窗",
+      "category": "玄幻",
+      "rank_type": "newfans",
+      "prev_rank": 23,
+      "cur_rank": 97,
+      "z_score": -2.68,
+      "direction": "down"
+    },
+    {
+      "title": "同时穿越：从诡秘开始的命途行者",
+      "author": "私斋拌鲜葱",
+      "category": "轻小说",
+      "rank_type": "newfans",
+      "prev_rank": 156,
+      "cur_rank": 69,
+      "z_score": 2.64,
+      "direction": "up"
+    },
+    {
+      "title": "序列：八道横行",
+      "author": "国产达闻西",
+      "category": "玄幻",
+      "rank_type": "hotsales",
+      "prev_rank": 108,
+      "cur_rank": 180,
+      "z_score": -2.61,
+      "direction": "down"
+    },
+    {
+      "title": "重生高考前99天",
+      "author": "柳岸花又明",
+      "category": "都市",
+      "rank_type": "readindex",
+      "prev_rank": 102,
+      "cur_rank": 40,
+      "z_score": 2.56,
+      "direction": "up"
+    },
+    {
+      "title": "吞噬星空：收徒万倍返还",
+      "author": "新乙",
+      "category": "诸天无限",
+      "rank_type": "hotsales",
+      "prev_rank": 144,
+      "cur_rank": 58,
+      "z_score": 2.53,
+      "direction": "up"
+    },
+    {
+      "title": "完美人生，从改变时间线开始",
+      "author": "不是老狗",
+      "category": "都市",
+      "rank_type": "recom",
+      "prev_rank": 159,
+      "cur_rank": 98,
+      "z_score": 2.52,
+      "direction": "up"
     }
   ],
-  "n_anomalies": 37,
-  "week": "2026-W38",
-  "updated_at": "2026-09-14T03:38:23.181785"
+  "n_anomalies": 39,
+  "week": "2026-W39",
+  "updated_at": "2026-09-21T03:34:03.917266"
 }
