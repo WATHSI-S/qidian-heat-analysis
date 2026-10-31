@@ -6,3 +6,9 @@ docs/css/
 docs/images/
 docs/picture/
 docs/scripts/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
