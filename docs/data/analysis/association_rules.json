@@ -1,119 +1,119 @@
 {
   "rules": [
     {
-      "antecedent": "readindex",
-      "consequent": "hotsales",
-      "support": 0.1578,
-      "confidence": 0.7111,
-      "lift": 3.204
-    },
-    {
-      "antecedent": "hotsales",
-      "consequent": "readindex",
-      "support": 0.1578,
-      "confidence": 0.7111,
-      "lift": 3.204
-    },
-    {
       "antecedent": "yuepiao",
       "consequent": "hotsales",
-      "support": 0.1554,
-      "confidence": 0.7,
-      "lift": 3.1539
+      "support": 0.1783,
+      "confidence": 0.6833,
+      "lift": 2.6194
     },
     {
       "antecedent": "hotsales",
       "consequent": "yuepiao",
-      "support": 0.1554,
-      "confidence": 0.7,
-      "lift": 3.1539
+      "support": 0.1783,
+      "confidence": 0.6833,
+      "lift": 2.6194
+    },
+    {
+      "antecedent": "readindex",
+      "consequent": "hotsales",
+      "support": 0.1739,
+      "confidence": 0.6667,
+      "lift": 2.5556
+    },
+    {
+      "antecedent": "hotsales",
+      "consequent": "readindex",
+      "support": 0.1739,
+      "confidence": 0.6667,
+      "lift": 2.5556
     },
     {
       "antecedent": "yuepiao",
       "consequent": "readindex",
-      "support": 0.1406,
-      "confidence": 0.6333,
-      "lift": 2.8535
+      "support": 0.1696,
+      "confidence": 0.65,
+      "lift": 2.4917
     },
     {
       "antecedent": "readindex",
       "consequent": "yuepiao",
-      "support": 0.1406,
-      "confidence": 0.6333,
-      "lift": 2.8535
-    },
-    {
-      "antecedent": "recom",
-      "consequent": "yuepiao",
-      "support": 0.1369,
-      "confidence": 0.6167,
-      "lift": 2.7784
+      "support": 0.1696,
+      "confidence": 0.65,
+      "lift": 2.4917
     },
     {
       "antecedent": "yuepiao",
       "consequent": "recom",
-      "support": 0.1369,
-      "confidence": 0.6167,
-      "lift": 2.7784
+      "support": 0.1652,
+      "confidence": 0.6333,
+      "lift": 2.4278
+    },
+    {
+      "antecedent": "recom",
+      "consequent": "yuepiao",
+      "support": 0.1652,
+      "confidence": 0.6333,
+      "lift": 2.4278
     },
     {
       "antecedent": "readindex",
       "consequent": "newfans",
-      "support": 0.1344,
+      "support": 0.158,
       "confidence": 0.6056,
-      "lift": 2.7284
+      "lift": 2.3213
     },
     {
       "antecedent": "newfans",
       "consequent": "readindex",
-      "support": 0.1344,
+      "support": 0.158,
       "confidence": 0.6056,
-      "lift": 2.7284
+      "lift": 2.3213
+    },
+    {
+      "antecedent": "newfans",
+      "consequent": "hotsales",
+      "support": 0.1493,
+      "confidence": 0.5722,
+      "lift": 2.1935
     },
     {
       "antecedent": "hotsales",
       "consequent": "newfans",
-      "support": 0.1307,
-      "confidence": 0.5889,
-      "lift": 2.6533
+      "support": 0.1493,
+      "confidence": 0.5722,
+      "lift": 2.1935
+    },
+    {
+      "antecedent": "yuepiao",
+      "consequent": "newfans",
+      "support": 0.142,
+      "confidence": 0.5444,
+      "lift": 2.087
     },
     {
       "antecedent": "newfans",
-      "consequent": "hotsales",
-      "support": 0.1307,
-      "confidence": 0.5889,
-      "lift": 2.6533
-    },
-    {
-      "antecedent": "recom",
-      "consequent": "readindex",
-      "support": 0.1196,
-      "confidence": 0.5389,
-      "lift": 2.428
-    },
-    {
-      "antecedent": "readindex",
-      "consequent": "recom",
-      "support": 0.1196,
-      "confidence": 0.5389,
-      "lift": 2.428
+      "consequent": "yuepiao",
+      "support": 0.142,
+      "confidence": 0.5444,
+      "lift": 2.087
     },
     {
       "antecedent": "recom",
       "consequent": "hotsales",
-      "support": 0.1147,
-      "confidence": 0.5167,
-      "lift": 2.3279
+      "support": 0.1377,
+      "confidence": 0.5278,
+      "lift": 2.0231
     },
     {
       "antecedent": "hotsales",
       "consequent": "recom",
-      "support": 0.1147,
-      "confidence": 0.5167,
-      "lift": 2.3279
+      "support": 0.1377,
+      "confidence": 0.5278,
+      "lift": 2.0231
     }
   ],
-  "n_transactions": 811,
-  "week": "2026-W31",
-  "updated_at": "2026-07-27T02:56:41.655962"
+  "n_transactions": 690,
+  "week": "2026-W44",
+  "updated_at": "2026-10-26T03:29:07.339038"
 }
