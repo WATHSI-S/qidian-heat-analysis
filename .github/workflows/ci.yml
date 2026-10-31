@@ -1,0 +1,37 @@
+name: Validate analysis and static site
+on:
+  pull_request:
+  push:
+    paths-ignore:
+      - 'data/**'
+permissions:
+  contents: read
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scraper/requirements.lock
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: pip install -r scraper/requirements.txt
+      - run: python -m pytest tests/test_collection.py tests/test_analysis.py tests/test_build.py -q
+      - run: node --test tests/frontend.test.js
+      - run: python scripts/build_site.py
+      - run: python -m playwright install --with-deps chromium
+      - run: python -m pytest tests/test_browser.py -q
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verified-static-site
+          path: dist/site/
+          if-no-files-found: ignore

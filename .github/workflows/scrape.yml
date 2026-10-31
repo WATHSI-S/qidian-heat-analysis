@@ -1,72 +1,112 @@
 name: Weekly Qidian Scrape
-
 on:
   schedule:
     - cron: '0 0 * * 1'
   workflow_dispatch:
-
+    inputs:
+      run_agent:
+        description: 'Run optional bounded Agent exploration'
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: qidian-weekly-data
+  cancel-in-progress: false
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    timeout-minutes: 60
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
-      - name: Install dependencies
-        run: |
-          pip install -r scraper/requirements.txt
-          playwright install chromium
-
-      - name: Run scraper
+          cache: pip
+          cache-dependency-path: scraper/requirements.lock
+      - run: pip install -r scraper/requirements.txt
+      - run: python -m playwright install --with-deps chromium
+      - name: Collect validated snapshot
+        id: crawl
         run: python scraper/crawl.py
-
-      - name: Run text mining analysis
-        run: python scraper/analysis/pipeline.py --text-only
-
-      - name: Run data mining analysis
+      - name: Build deterministic summary
+        run: python scraper/analysis/pipeline.py summary
+      - name: Text mining
+        run: python scraper/analysis/pipeline.py text
+      - name: Statistical analysis
         continue-on-error: true
-        run: python scraper/analysis/pipeline.py --data-mining-only
-
-      - name: Run LLM analysis
-        continue-on-error: true
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python scraper/analysis/pipeline.py --skip-text-mining
-
-      - name: Run AI Agent analysis
+        run: python scraper/analysis/pipeline.py data
+      - uses: actions/cache@v4
+        with:
+          path: data/cache
+          key: qidian-llm-v2-${{ github.run_id }}
+          restore-keys: qidian-llm-v2-
+      - name: Optional cached LLM extraction
         continue-on-error: true
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python scraper/analysis/pipeline.py --agent-only
-
-      - name: Copy data into docs for deployment
-        run: |
-          rm -rf docs/data/
-          cp -r data/ docs/data/
-
-      - name: Commit and push if changes
+        run: python scraper/analysis/pipeline.py llm
+      - name: Unified weekly report
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scraper/analysis/pipeline.py report
+      - name: Optional manual Agent exploration
+        if: github.event_name == 'workflow_dispatch' && inputs.run_agent
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scraper/analysis/pipeline.py agent
+      - name: Verify static publication artifact
+        run: python scripts/build_site.py --skip-optional
+      - name: Commit validated data and scoped results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/ docs/data/
-          if git diff --cached --quiet; then
-            echo "No new data to commit"
-          else
-            git commit -m "data: weekly scrape $(date +%Y-W%V)"
+          git add data/
+          if ! git diff --cached --quiet; then
+            git commit -m "data: validated weekly snapshots and analysis"
             git push
           fi
-
-      - name: Deploy to VPS via rsync
+      - name: Deploy verified artifact to VPS
+        if: env.VPS_HOST != ''
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+          VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
-            docs/ \
-            ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:/var/www/qidian-heat-analysis/
+          rsync -avz --delay-updates --delete -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" dist/site/ "$VPS_USERNAME@$VPS_HOST:/var/www/qidian-heat-analysis/"
+      - name: Stage summary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          paths = sorted(Path('data/analysis').glob('????-W??/run.json'))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream:
+              stream.write('## Analysis stages\n\n')
+              for path in paths[-1:]:
+                  run = json.loads(path.read_text())
+                  stream.write(f"Data week: {run['week']}\n\n")
+                  for stage, value in run['stages'].items():
+                      stream.write(f"- {stage}: {value['status']}\n")
+              stream.write('\nIncomplete crawls, if any, are retained in the diagnostics artifact.\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: crawl-diagnostics
+          path: |
+            data/partial/
+            data/analysis/*/run.json
+            data/analysis/*/attempts/
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: static-site
+          path: dist/site/

@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """Generate sample data for frontend testing."""
 
+import argparse
 import json
 import random
-import sys
 from datetime import date, timedelta
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+DATA_DIR = Path(__file__).resolve().parent.parent / "tests" / "fixtures" / "sample"
 
 # Realistic Qidian-style data pools
 TITLES = [
@@ -63,15 +62,27 @@ def generate_week(week_label: str, books_per_rank: int = 160) -> dict:
     # Add some week-to-week ranking perturbation
     random.shuffle(books)
     return {
+        "source": "sample",
+        "schema_version": 2,
         "week": week_label,
-        "scraped_at": f"{week_label}T08:00:00",
+        "scraped_at": date.fromisocalendar(int(week_label[:4]), int(week_label[-2:]), 1).isoformat() + "T08:00:00+08:00",
         "total": len(books),
         "books": books,
     }
 
 
 def main():
-    weeks = int(sys.argv[1]) if len(sys.argv) > 1 else 3
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("weeks", type=int, nargs="?", default=3)
+    parser.add_argument("--output", type=Path, default=DATA_DIR)
+    parser.add_argument("--seed", type=int, default=42)
+    args = parser.parse_args()
+    if args.weeks < 1:
+        parser.error("weeks must be positive")
+    random.seed(args.seed)
+    data_dir = args.output
+    data_dir.mkdir(parents=True, exist_ok=True)
+    weeks = args.weeks
     today = date.today()
 
     for i in range(weeks):
@@ -79,7 +90,7 @@ def main():
         iso = dt.isocalendar()
         label = f"{iso[0]}-W{iso[1]:02d}"
         data = generate_week(label)
-        fpath = DATA_DIR / f"{label}.json"
+        fpath = data_dir / f"{label}.json"
         with open(fpath, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         print(f"Generated {fpath} ({data['total']} books)")
@@ -89,7 +100,7 @@ def main():
     all_titles = set()
     all_authors = set()
     cats = {}
-    for fp in sorted(DATA_DIR.glob("20*.json")):
+    for fp in sorted(data_dir.glob("20*.json")):
         with open(fp, "r", encoding="utf-8") as f:
             snap = json.load(f)
         weeks_list.append({
@@ -112,7 +123,7 @@ def main():
         "unique_authors": len(all_authors),
         "categories": cats,
     }
-    idx_path = DATA_DIR / "index.json"
+    idx_path = data_dir / "index.json"
     with open(idx_path, "w", encoding="utf-8") as f:
         json.dump(index, f, ensure_ascii=False, indent=2)
     print(f"Index written: {idx_path} ({len(weeks_list)} weeks)")

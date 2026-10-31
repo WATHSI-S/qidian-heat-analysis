@@ -1,513 +1,56 @@
-/**
- * 起点天榜 · 热度洞察 — Dashboard engine v3
- * Dark ink-wash theme, ECharts rendering
- */
-
-const DATA_BASE = window.location.pathname.includes('/docs/') ? '../data/' : './data/';
-let allCharts = [];
-let currentRankTab = 'yuepiao';
-let allBooks = [];
-
-// ── Helpers ───────────────────────────────────────
-
-async function fetchJSON(path) {
-  const resp = await fetch(path);
-  if (!resp.ok) throw new Error(`HTTP ${resp.status} for ${path}`);
-  return resp.json();
-}
-
-function resizeAll() { allCharts.forEach(c => { try { c.resize(); } catch (e) { /* ignore */ } }); }
-window.addEventListener('resize', resizeAll);
-
-function initChart(domId) {
-  const dom = document.getElementById(domId);
-  if (!dom) return null;
-  const existing = echarts.getInstanceByDom(dom);
-  if (existing) existing.dispose();
-  const chart = echarts.init(dom, null, { renderer: 'svg' });
-  allCharts.push(chart);
-  return chart;
-}
-
-const RANK_LABELS = {
-  yuepiao: '月票榜', hotsales: '畅销榜', readindex: '阅读指数榜',
-  recom: '推荐榜', collect: '收藏榜', newfans: '书友榜',
-  vipup: '更新榜', signnewbook: '签约新书榜',
-};
-function rankLabel(k) { return RANK_LABELS[k] || k; }
-function esc(s) { return (s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-
-// ── Shared ECharts dark theme base ────────────────
-
-const DARK_TEXT = '#9a8e7e';
-const DARK_AXIS = '#362f26';
-const GOLD = '#c9a96e';
-const VERMILLION = '#e74c3c';
-
-function darkAxis(name) {
-  return {
-    axisLine: { lineStyle: { color: DARK_AXIS } },
-    axisTick: { show: false },
-    axisLabel: { color: DARK_TEXT, fontSize: 11 },
-    splitLine: { lineStyle: { color: 'rgba(54,47,38,0.3)' } },
-    name: name || '',
-    nameTextStyle: { color: DARK_TEXT, fontSize: 11 },
-  };
-}
-
-function darkTooltip() {
-  return {
-    backgroundColor: '#2a2218',
-    borderColor: '#5a4a30',
-    textStyle: { color: '#e0d6c2', fontSize: 12, fontFamily: 'Noto Sans SC' },
-  };
-}
-
-// ── Data Loading ──────────────────────────────────
-
-async function loadIndex() {
-  try { return await fetchJSON(DATA_BASE + 'index.json'); }
-  catch { return await fetchJSON('./data/index.json'); }
-}
-
-async function loadWeekData(filename) {
-  try { return await fetchJSON(DATA_BASE + filename); }
-  catch { return await fetchJSON('./data/' + filename); }
-}
-
-async function loadAllWeeks(index) {
-  const snaps = [];
-  for (const w of (index.weeks || [])) {
-    try {
-      const d = await loadWeekData(w.file);
-      if (d) snaps.push(d);
-    } catch { /* skip */ }
-  }
-  return snaps;
-}
-
-// ── Overview Marks ────────────────────────────────
-
-function renderOverview(index) {
-  document.getElementById('updateTime').textContent =
-    '最近天机更新: ' + (index.updated_at || '—') + ' · 收录 ' + (index.total_weeks || 0) + ' 周';
-
-  const cats = Object.keys(index.categories || {}).length;
-  document.getElementById('overviewStats').innerHTML = [
-    { v: index.total_weeks || 0, l: '收录周数' },
-    { v: index.unique_titles || 0, l: '收录小说' },
-    { v: index.unique_authors || 0, l: '收录作者' },
-    { v: cats, l: '覆盖分类' },
-  ].map(s =>
-    `<div class="mark"><div class="mark-val">${s.v}</div><div class="mark-label">${s.l}</div></div>`
-  ).join('');
-}
-
-// ── Rank Pills ────────────────────────────────────
-
-function buildPills() {
-  const container = document.getElementById('rankTabs');
-  const types = Object.keys(RANK_LABELS);
-  container.innerHTML = types.map(rt =>
-    `<button class="rank-pill${rt === currentRankTab ? ' active' : ''}" data-rank="${rt}">${rankLabel(rt)}</button>`
-  ).join('');
-
-  container.querySelectorAll('.rank-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      container.querySelectorAll('.rank-pill').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentRankTab = btn.dataset.rank;
-      renderTopThree(allBooks);
-      renderRankBars(allBooks);
-      renderTable(allBooks);
-    });
-  });
-}
-
-function buildTablePick() {
-  const sel = document.getElementById('tableRankFilter');
-  sel.innerHTML = Object.entries(RANK_LABELS).map(([k, v]) =>
-    `<option value="${k}">${v}</option>`
-  ).join('');
-  sel.value = currentRankTab;
-  sel.addEventListener('change', () => {
-    currentRankTab = sel.value;
-    document.querySelectorAll('.rank-pill').forEach(b => {
-      b.classList.toggle('active', b.dataset.rank === currentRankTab);
-    });
-    renderTopThree(allBooks);
-    renderRankBars(allBooks);
-    renderTable(allBooks);
-  });
-}
-
-// ── Category color map (consistent across all charts) ─
-
-const CAT_COLORS = {
-  '玄幻':    ['#e8c878', '#c9a96e'],  // gold
-  '都市':    ['#5b8db8', '#3d6d99'],  // steel blue
-  '仙侠':    ['#6dbe8a', '#4a8a60'],  // jade green
-  '历史':    ['#c97a5a', '#a05a3d'],  // terracotta
-  '科幻':    ['#48c9b0', '#2e9e8a'],  // teal
-  '奇幻':    ['#a569bd', '#7d3c98'],  // amethyst
-  '轻小说':  ['#e8919c', '#c06d7a'],  // rose
-  '游戏':    ['#58d68d', '#3a9d60'],  // bright green
-  '悬疑灵异': ['#85929e', '#5d6d7a'], // slate
-  '现实':    ['#e67e22', '#b85d0e'],  // orange
-  '武侠':    ['#e74c3c', '#b5302a'],  // vermillion
-  '军事':    ['#7d9648', '#5a6e2e'],  // olive
-  '体育':    ['#5dade2', '#3a85b0'],  // sky blue
-  '诸天无限': ['#7d5fb8', '#5a3d90'], // deep violet
-};
-
-function catGradient(cat) {
-  const pair = CAT_COLORS[cat] || ['#9a8e7e', '#6b6058'];
-  return new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-    { offset: 0, color: pair[0] }, { offset: 1, color: pair[1] },
-  ]);
-}
-
-function catColor(cat) {
-  return (CAT_COLORS[cat] || ['#9a8e7e', '#6b6058'])[0];
-}
-
-// ── Rank Bars ─────────────────────────────────────
-
-// Score: #1 ≈ 100, #125 ≈ 0.8 — bigger bar = more popular (intuitive)
-function rankToScore(rank, maxRank) {
-  return Math.round((maxRank - rank + 1) / maxRank * 100);
-}
-
-function renderTopThree(books) {
-  const container = document.getElementById('topThreeCards');
-  if (!container) return;
-  const ranked = books
-    .filter(b => b.rank_type === currentRankTab)
-    .sort((a, b) => a.rank - b.rank)
-    .slice(0, 3);
-  const medals = ['一', '二', '三'];
-  container.innerHTML = ranked.map((b, i) => `
-    <div class="top-card rank-${i + 1}">
-      <span class="top-card-medal">${medals[i]}</span>
-      <div class="top-card-info">
-        <a href="${b.url || '#'}" target="_blank" rel="noopener" class="top-card-title">${esc(b.title)}</a>
-        <span class="top-card-meta">${esc(b.author)} · ${esc(b.category)}</span>
-      </div>
-      <span class="top-card-rank">${b.rank}</span>
-    </div>
-  `).join('');
-}
-
-function renderRankBars(books) {
-  const chart = initChart('chart-rank-bars');
-  if (!chart) return;
-
-  const maxRank = 125;
-  const ranked = books
-    .filter(b => b.rank_type === currentRankTab)
-    .sort((a, b) => a.rank - b.rank)
-    .slice(0, 30);
-
-  const names = ranked.map(b => (b.title.length > 14 ? b.title.slice(0, 13) + '…' : b.title));
-  const data = ranked.map(b => rankToScore(b.rank, maxRank));
-
-  chart.setOption({
-    tooltip: {
-      ...darkTooltip(),
-      trigger: 'axis',
-      axisPointer: { type: 'shadow' },
-      formatter: (p) => {
-        const d = Array.isArray(p) ? p[0] : p;
-        const bk = ranked[d.dataIndex];
-        if (!bk) return '';
-        return `<div style="font-size:13px;font-weight:700;margin-bottom:4px">#${bk.rank} ${esc(bk.title)}</div>`
-          + `<div>热度值: <b style="color:#c9a96e">${rankToScore(bk.rank, maxRank)}</b></div>`
-          + `<div>作者: ${esc(bk.author)}</div>`
-          + `<div>分类: <b style="color:${catColor(bk.category)}">${esc(bk.category)}</b> · ${esc(bk.status)}</div>`
-          + `<div style="color:#9a8e7e;margin-top:4px">${esc(bk.intro)}</div>`;
-      },
-    },
-    grid: { left: 6, right: 50, top: 8, bottom: 6, containLabel: true },
-    xAxis: {
-      type: 'value', max: 100,
-      ...darkAxis('热度值'),
-    },
-    yAxis: {
-      type: 'category',
-      data: names,
-      inverse: true,
-      axisLabel: { color: '#c0b8a8', fontSize: 11, width: 135, overflow: 'truncate' },
-      axisLine: { show: false },
-      axisTick: { show: false },
-    },
-    series: [{
-      type: 'bar',
-      data: data.map((score, i) => ({
-        value: score,
-        itemStyle: {
-          color: catGradient(ranked[i].category),
-          borderRadius: [0, 3, 3, 0],
-        },
-      })),
-      barWidth: 16,
-      label: { show: true, position: 'right', fontSize: 10, color: DARK_TEXT,
-        formatter: p => ranked[p.dataIndex].rank },
-    }],
-  }, true);
-}
-
-// ── Category Pie ──────────────────────────────────
-
-function renderCategory(books) {
-  const chart = initChart('chart-category');
-  if (!chart) return;
-
-  const cats = {};
-  books.forEach(b => { const c = b.category || '未知'; cats[c] = (cats[c] || 0) + 1; });
-  const data = Object.entries(cats).sort((a, b) => b[1] - a[1]);
-
-  // palette: warm golds + accents
-  const palette = [
-    '#c9a96e','#e74c3c','#5b8db8','#27ae60','#d4a574',
-    '#8e44ad','#e67e22','#2ecc71','#95a5a6','#f39c12',
-    '#3498db','#1abc9c','#9b59b6','#e91e63',
-  ];
-
-  chart.setOption({
-    tooltip: { ...darkTooltip(), trigger: 'item', formatter: '{b}: {c} 本 ({d}%)' },
-    series: [{
-      type: 'pie',
-      radius: ['48%', '78%'],
-      center: ['50%', '52%'],
-      roseType: 'area',
-      data: data.map(([name, value]) => ({ name, value })),
-      label: { color: '#c0b8a8', fontSize: 10, formatter: '{b} {d}%' },
-      itemStyle: {
-        borderColor: '#1e1b15',
-        borderWidth: 2,
-        borderRadius: 2,
-      },
-      color: palette,
-    }],
-  }, true);
-}
-
-// ── Status Donut ──────────────────────────────────
-
-function renderStatus(books) {
-  const chart = initChart('chart-status');
-  if (!chart) return;
-
-  const st = {};
-  books.forEach(b => { const s = b.status || '未知'; st[s] = (st[s] || 0) + 1; });
-
-  const colors = { '连载': '#5b8db8', '完本': '#27ae60', '未知': '#555' };
-
-  chart.setOption({
-    tooltip: { ...darkTooltip(), trigger: 'item', formatter: '{b}: {c} 本 ({d}%)' },
-    series: [{
-      type: 'pie',
-      radius: ['50%', '82%'],
-      center: ['50%', '50%'],
-      data: Object.entries(st).map(([name, value]) => ({
-        name, value,
-        itemStyle: { color: colors[name] || '#555', borderColor: '#1e1b15', borderWidth: 3 },
-      })),
-      label: { color: '#c0b8a8', fontSize: 13, formatter: '{b}\n{d}%' },
-      emphasis: {
-        scaleSize: 8,
-        itemStyle: { shadowBlur: 20, shadowColor: 'rgba(0,0,0,0.5)' },
-      },
-    }],
-  }, true);
-}
-
-// ── Author Scatter (星光图) ─────────────────────
-
-function renderAuthors(weeks) {
-  const chart = initChart('chart-authors');
-  if (!chart) return;
-
-  const counts = {};
-  const authorCats = {};
-  weeks.forEach(w => {
-    (w.books || []).forEach(b => {
-      if (b.author) {
-        counts[b.author] = (counts[b.author] || 0) + 1;
-        if (!authorCats[b.author]) authorCats[b.author] = {};
-        const cat = b.category || '未知';
-        authorCats[b.author][cat] = (authorCats[b.author][cat] || 0) + 1;
-      }
-    });
-  });
-
-  const data = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 20);
-  const maxCount = data[0][1];
-
-  chart.setOption({
-    tooltip: {
-      ...darkTooltip(), trigger: 'item',
-      formatter: p => {
-        const cats = authorCats[p.name];
-        const primary = cats ? Object.entries(cats).sort((a, b) => b[1] - a[1])[0] : null;
-        return `<div style="font-size:13px;font-weight:700">${p.name}</div>`
-          + `累计上榜 <b style="color:#c9a96e">${p.value}</b> 次`
-          + (primary ? `<div>主攻分类: <b style="color:${catColor(primary[0])}">${primary[0]}</b></div>` : '');
-      },
-    },
-    grid: { left: 6, right: 50, top: 8, bottom: 28, containLabel: true },
-    xAxis: { type: 'value', ...darkAxis('累计上榜次数'), nameLocation: 'center', nameGap: 22 },
-    yAxis: {
-      type: 'category',
-      data: data.map(d => d[0]),
-      inverse: true,
-      axisLabel: { color: '#c0b8a8', fontSize: 11 },
-      axisLine: { show: false }, axisTick: { show: false },
-    },
-    series: [{
-      type: 'scatter',
-      data: data.map((d, i) => {
-        const cats = authorCats[d[0]];
-        const primary = cats ? Object.entries(cats).sort((a, b) => b[1] - a[1])[0] : null;
-        const primaryCat = primary ? primary[0] : '';
-        const color = catColor(primaryCat);
-        return {
-          value: [d[1], i],
-          symbolSize: 8 + (d[1] / maxCount) * 22,
-          itemStyle: {
-            color: new echarts.graphic.RadialGradient(0.5, 0.5, 1, [
-              { offset: 0, color: color },
-              { offset: 0.6, color: color },
-              { offset: 1, color: 'rgba(30,27,21,0.1)' },
-            ]),
-            shadowBlur: 10,
-            shadowColor: 'rgba(201,169,110,0.3)',
-          },
-        };
-      }),
-      label: { show: true, position: 'right', fontSize: 10, color: DARK_TEXT,
-        formatter: p => p.value[0] + ' 次' },
-      emphasis: {
-        scale: 1.5,
-        itemStyle: { shadowBlur: 20, shadowColor: 'rgba(201,169,110,0.7)' },
-      },
-    }],
-  }, true);
-}
-
-// ── Cross-Rank Leaderboard ──────────────────────
-
-function renderCrossRank(books) {
-  const board = document.getElementById('crossrankBoard');
-  if (!board) return;
-
-  const rankTypes = Object.keys(RANK_LABELS);
-
-  // Build per-book rank lookup
-  const presence = {};
-  books.forEach(b => {
-    const key = b.title + '|' + b.author;
-    if (!presence[key]) {
-      presence[key] = { title: b.title, author: b.author, category: b.category, status: b.status, url: b.url, ranks: {} };
-    }
-    presence[key].ranks[b.rank_type] = b.rank;
-  });
-
-  const topBooks = Object.values(presence)
-    .map(b => ({ ...b, coverage: Object.keys(b.ranks).length }))
-    .sort((a, b) => b.coverage - a.coverage)
-    .slice(0, 12);
-
-  board.innerHTML = topBooks.map((b, i) => {
-    // Badge color by rank tier
-    const badgeColors = {
-      yuepiao: '#c9a96e', hotsales: '#e8c878', readindex: '#5b8db8',
-      recom: '#27ae60', collect: '#8e44ad', newfans: '#e67e22',
-      vipup: '#e74c3c', signnewbook: '#95a5a6',
-    };
-
-    // Build sorted rank badges
-    const badges = Object.entries(b.ranks)
-      .sort((a, b) => a[1] - b[1])
-      .map(([rt, rank]) => {
-        const color = badgeColors[rt] || '#888';
-        const label = rankLabel(rt).replace('榜', '');
-        return `<span class="cr-badge" style="border-color:${color};color:${color}">${label}<em>#${rank}</em></span>`;
-      })
-      .join('');
-
-    // Medal for top 3
-    const medals = ['gold', 'silver', 'bronze'];
-    const medalClass = i < 3 ? ` cr-medal-${medals[i]}` : '';
-
-    return `
-      <div class="cr-card${i < 3 ? ' cr-top' + (i + 1) : ''}">
-        <div class="cr-rank${medalClass}">${i + 1}</div>
-        <div class="cr-body">
-          <div class="cr-title">
-            <a href="${b.url || '#'}" target="_blank" rel="noopener">${esc(b.title)}</a>
-            <span class="cr-coverage">霸占 <b>${b.coverage}/8</b> 榜</span>
-          </div>
-          <div class="cr-meta">${esc(b.author)} · ${esc(b.category)} · <span class="status-badge ${b.status === '完本' ? 'done' : 'ongoing'}">${esc(b.status)}</span></div>
-          <div class="cr-badges">${badges}</div>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-// ── Ranking Table ─────────────────────────────────
-
-function renderTable(books) {
-  const tbody = document.querySelector('#rankingTable tbody');
-  if (!tbody) return;
-
-  const filtered = books
-    .filter(b => b.rank_type === currentRankTab)
-    .sort((a, b) => a.rank - b.rank)
-    .slice(0, 125);
-
-  tbody.innerHTML = filtered.map(b => `
-    <tr>
-      <td>${b.rank || '-'}</td>
-      <td><a href="${b.url || '#'}" target="_blank" rel="noopener" title="${esc(b.intro || '')}">${esc(b.title)}</a></td>
-      <td>${esc(b.author)}</td>
-      <td>${esc(b.category)}</td>
-      <td><span class="status-badge ${b.status === '完本' ? 'done' : 'ongoing'}">${esc(b.status)}</span></td>
-    </tr>
-  `).join('');
-}
-
-// ── Main ──────────────────────────────────────────
-
-async function main() {
-  try {
-    const index = await loadIndex();
-    renderOverview(index);
-
-    const weeks = await loadAllWeeks(index);
-    const latest = weeks[weeks.length - 1];
-    if (!latest) {
-      document.getElementById('updateTime').textContent = '— 暂无数据，等待首次天机降临 —';
-      return;
-    }
-
-    allBooks = latest.books;
-
-    buildPills();
-    buildTablePick();
-
-    renderTopThree(allBooks);
-    renderRankBars(allBooks);
-    renderCategory(allBooks);
-    renderStatus(allBooks);
-    renderAuthors(weeks);
-    renderCrossRank(allBooks);
-    renderTable(allBooks);
-
-  } catch (err) {
-    console.error('天榜启动失败:', err);
-    document.getElementById('updateTime').textContent = '天机紊乱: ' + err.message;
-  }
-}
-
-document.addEventListener('DOMContentLoaded', main);
+import {loadDashboard,loadAnalysisFile,esc,bookKey,bookLink,rankLabel,RANK_LABELS,initChart,disposeChart,darkAxis,darkTooltip,markdownHTML} from './js/shared.js';
+import {researchRenderers} from './js/research.js';
+let data,epoch=0,drawerEpoch=0,view='rankings',returnFocus;
+const states={rankings:{mode:'heat',q:'',category:'',page:1,sort:'default',scroll:0},categories:{metric:'heat',scroll:0},topics:{metric:'keywords',category:'',scroll:0},report:{scroll:0}};
+const content=document.querySelector('#content'),dialog=document.querySelector('#drawer'),body=document.querySelector('#drawerBody');
+const labels={rankings:'榜单总览',categories:'分类风向',topics:'题材洞察',report:'周度报告'};
+const option=(value,label,current)=>`<option value="${esc(value)}" ${value===current?'selected':''}>${esc(label)}</option>`;
+const categories=()=>data.summary.catRankings.map(c=>c.name);
+const number=v=>v===null||v===undefined?'—':typeof v==='number'?Math.round(v*100)/100:esc(v);
+const detail=(pairs)=>`<dl>${pairs.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${number(v)}</dd>`).join('')}</dl>`;
+const bookButton=b=>`<button class="link" data-book="${esc(bookKey(b))}">${esc(b.title)}</button><small>${esc(b.author)}</small>`;
+function closeDrawer(){drawerEpoch++;disposeChart('research-chart');if(dialog.open)dialog.close();returnFocus?.focus();}
+function openDrawer(title,html,wide=false){returnFocus=dialog.open?returnFocus:document.activeElement;drawerEpoch++;disposeChart('research-chart');dialog.classList.toggle('wide',wide);document.querySelector('#drawerTitle').textContent=title;body.innerHTML=html;if(!dialog.open)dialog.showModal();}
+function status(result){return result?`来源周 ${result.week}${result.stale?' · 历史结果':''}${result.status==='partial'?' · 部分可用':''}${['error','unavailable'].includes(result.attempt_status)?' · 最近尝试失败，保留有效结果':''}`:'本周分析不可用';}
+function rankings(){const s=states.rankings,{snapshot,summary}=data;
+ let rows=s.mode==='heat'?summary.heatScores:snapshot.books.filter(b=>b.rank_type===s.mode);
+ rows=rows.filter(b=>(!s.category||b.category===s.category)&&(!s.q||`${b.title} ${b.author}`.toLowerCase().includes(s.q.toLowerCase())));
+ const weeks=new Map(summary.appearances.map(b=>[bookKey(b),b.weeks]));
+ rows=[...rows].sort((a,b)=>s.sort==='weeks'?(weeks.get(bookKey(b))||0)-(weeks.get(bookKey(a))||0):s.sort==='name'?a.title.localeCompare(b.title,'zh'):s.mode==='heat'?b.score-a.score:a.rank-b.rank);
+ const pages=Math.max(1,Math.ceil(rows.length/20));s.page=Math.min(pages,s.page);const start=(s.page-1)*20;
+ const change=b=>s.mode==='heat'?summary.momentum[bookKey(b)]?.heatDelta:summary.rankChanges.find(c=>bookKey(c)===bookKey(b)&&c.rank_type===s.mode)?.delta;
+ const delta=b=>{const v=change(b);return v==null?'—':v>0?'↑'+v:v<0?'↓'+Math.abs(v):'持平'};
+ content.innerHTML=`<section class="stats">${[[summary.n_books,'本周书目'],[new Set(summary.heatScores.map(b=>b.author)).size,'本周作者'],[categories().length,'本周分类'],[Object.values(snapshot.quality.rankings).filter(q=>q.status==='complete').length+'/8','完整榜单']].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('')}</section><div class="controls"><select aria-label="榜单" id="rankMode">${option('heat','综合热度',s.mode)+Object.entries(RANK_LABELS).map(([k,v])=>option(k,v,s.mode)).join('')}</select><input id="search" aria-label="搜索作品或作者" placeholder="搜索作品或作者" value="${esc(s.q)}"><select id="category" aria-label="分类">${option('','全部分类',s.category)+categories().map(c=>option(c,c,s.category)).join('')}</select><select id="sort" aria-label="排序">${option('default','默认排序',s.sort)+option('weeks','累计周数',s.sort)+option('name','作品名称',s.sort)}</select></div><section class="card"><div class="notice">${rows.length} ${s.mode==='heat'?'本去重书目':'条已采集记录'} · 变化仅基于共同完整榜单${s.mode!=='heat'&&snapshot.quality.rankings[s.mode].status!=='complete'?' · 当前榜单不完整':''}</div><div class="table-wrap"><table><thead><tr>${(s.mode==='heat'?['序号','作品 / 作者','分类','热度','可比变化','榜单数','累计周数']:['名次','作品 / 作者','分类','可比变化','状态']).map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.slice(start,start+20).map((b,i)=>`<tr><td>${s.mode==='heat'?start+i+1:b.rank}</td><td>${bookButton(b)}</td><td><button class="link" data-category="${esc(b.category)}">${esc(b.category)}</button></td>${s.mode==='heat'?`<td>${number(b.score)}</td><td>${delta(b)}</td><td>${b.listCount}</td><td>${weeks.get(bookKey(b))||0}</td>`:`<td>${delta(b)}</td><td>${esc(b.status)}</td>`}</tr>`).join('')}</tbody></table></div>${!rows.length?'<p class="empty">没有匹配记录，或该榜单未完成采集。</p>':''}<div class="pagination"><button id="prev" ${s.page===1?'disabled':''}>上一页</button><span>${s.page} / ${pages}</span><button id="next" ${s.page===pages?'disabled':''}>下一页</button></div></section>`;
+ for(const [id,key] of [['rankMode','mode'],['category','category'],['sort','sort']])document.getElementById(id).onchange=e=>{s[key]=e.target.value;s.page=1;rankings();};
+ document.querySelector('#search').oninput=e=>{s.q=e.target.value;s.page=1;const pos=e.target.selectionStart;rankings();const input=document.querySelector('#search');input.focus();input.setSelectionRange(pos,pos);};
+ document.querySelector('#prev').onclick=()=>{s.page--;rankings();};document.querySelector('#next').onclick=()=>{s.page++;rankings();};}
+function bar(id,items,label){const chart=initChart(id);if(!chart)return;chart.setOption({tooltip:{...darkTooltip(),trigger:'axis'},grid:{left:12,right:30,top:15,bottom:25,containLabel:true},xAxis:{type:'value',...darkAxis(label)},yAxis:{type:'category',data:items.map(i=>i.name),inverse:true,...darkAxis()},series:[{type:'bar',data:items.map(i=>i.value),itemStyle:{color:'#c9a96e'},barMaxWidth:22}]},true);return chart;}
+function categoryView(){const s=states.categories;content.innerHTML=`<div class="controls"><select id="categoryMetric" aria-label="分类指标">${option('heat','本周热度',s.metric)+option('momentum','周间动量',s.metric)}</select><span class="muted">点击分类查看指标组成与代表作品</span></div><section class="card"><div class="chart" id="main-chart"></div></section>`;
+ const items=s.metric==='heat'?data.summary.catRankings.map(c=>({name:c.name,value:c.totalHeat})):data.summary.catMomentum.filter(c=>c.cmiNorm!==null).map(c=>({name:c.category,value:c.cmiNorm}));
+ if(!items.length)document.querySelector('#main-chart').innerHTML='<p class="empty">暂无同口径可比数据</p>';else bar('main-chart',items,s.metric==='heat'?'热度':'动量')?.on('click',p=>categoryDrawer(p.name));
+ document.querySelector('#categoryMetric').onchange=e=>{s.metric=e.target.value;disposeChart('main-chart');categoryView();};}
+async function topics(token){const s=states.topics;const scoped=['keywords','genres'].includes(s.metric);content.innerHTML=`<div class="controls"><select id="topicMetric" aria-label="题材指标">${Object.entries({keywords:'简介关键词',genres:'流派标签',archetypes:'主角人设 · LLM样本',fingers:'金手指 · LLM样本',world:'世界观 · LLM样本'}).map(([k,v])=>option(k,v,s.metric)).join('')}</select>${scoped?`<select id="topicCategory" aria-label="题材分类">${option('','全部分类',s.category)+categories().map(c=>option(c,c,s.category)).join('')}</select>`:''}</div><p id="topicStatus" class="notice">加载分析…</p><section class="card"><div id="main-chart" class="chart"></div></section>`;
+ document.querySelector('#topicMetric').onchange=e=>{s.metric=e.target.value;render();};document.querySelector('#topicCategory')?.addEventListener('change',e=>{s.category=e.target.value;render();});
+ const file=s.metric==='keywords'?(s.category?'category_keywords.json':'keywords.json'):s.metric==='genres'?'genre_tags.json':'llm_insights.json';const result=await loadAnalysisFile(file,data.snapshot.week,!scoped);if(token!==epoch)return;
+ const sample=result?.sample;document.querySelector('#topicStatus').textContent=status(result)+(sample?` · 头部轮询样本 ${result.n_books}/${sample.population} 本；${Object.entries(sample.categories).map(([k,v])=>k+' '+v).join('、')}`:'');
+ let items=[];if(result){if(s.metric==='keywords')items=(s.category?result.categories?.[s.category]?.top:result.top)?.map(d=>({name:d.token,value:d.tfidf}))||[];else if(s.metric==='genres')items=(s.category?result.by_category?.[s.category]:result.global)?.map(d=>({name:d.tag,value:d.count}))||[];else{const key={archetypes:'archetype_distribution',fingers:'golden_finger_distribution',world:'top_world_keywords'}[s.metric];items=(result.aggregations?.[key]||[]).map(d=>({name:d.type||d.keyword,value:d.count}));}}
+ if(items.length)bar('main-chart',items.slice(0,20),s.metric==='keywords'?'TF-IDF权重':'样本频次');else document.querySelector('#main-chart').innerHTML='<p class="empty">该范围的分析不可用或样本不足</p>';}
+async function report(token){content.innerHTML='<div class="controls"><button data-drawer="faq">报告问答 ↗</button><span class="notice" id="reportStatus"></span></div><article class="report card" id="reportBody">正在读取报告…</article>';const r=await loadAnalysisFile('weekly_report.json',data.snapshot.week,true);if(token!==epoch)return;document.querySelector('#reportStatus').textContent=status(r);document.querySelector('#reportBody').innerHTML=r?markdownHTML(r.markdown):'<p>报告暂不可用</p>';const headings=[...content.querySelectorAll('h2')];headings.forEach((h,i)=>h.id='section-'+i);document.querySelector('#reportOutline').innerHTML=headings.map((h,i)=>`<a href="#section-${i}" data-section="section-${i}">${esc(h.textContent)}</a>`).join('');}
+async function render(){const token=++epoch;closeDrawer();disposeChart('main-chart');document.querySelector('#reportOutline').innerHTML='';document.querySelector('#viewTitle').textContent=labels[view];document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('active',a.hash==='#/'+view));document.body.classList.remove('nav-open');document.querySelector('#navShade').hidden=true;
+ if(view==='rankings')rankings();else if(view==='categories')categoryView();else if(view==='topics')await topics(token);else await report(token);if(token===epoch)content.scrollTop=states[view].scroll;}
+function bookDrawer(key){const b=data.summary.heatScores.find(b=>bookKey(b)===key);if(!b)return;const weeks=data.summary.appearances.find(a=>bookKey(a)===key)?.weeks||0;openDrawer(b.title,detail([['作者',b.author],['分类',b.category],['状态',b.status],['综合热度',b.score],['累计周数',weeks]])+`<h3>各榜表现</h3><table>${b.ranks.map(r=>{const c=data.summary.rankChanges.find(c=>bookKey(c)===key&&c.rank_type===r.type);return `<tr><td>${rankLabel(r.type)}</td><td>第 ${r.rank} 名</td><td>${c?.delta==null?'不可比':number(c.delta)}</td></tr>`}).join('')}</table><h3>作品简介</h3><p>${esc(b.intro||'暂无简介')}</p>${bookLink({...b,title:'查看原站作品'})}`);}
+function categoryDrawer(name){const c=data.summary.catRankings.find(c=>c.name===name);if(!c)return;const e=data.summary.entryScores.find(e=>e.category===name)||{},g=data.summary.marketGaps.find(e=>e.category===name)||{},m=data.summary.catMomentum.find(e=>e.category===name)||{};openDrawer(name,detail([['本周书目',c.total],['热度',c.totalHeat],['周间动量',m.cmiNorm],['新书活跃 EFS',e.entryScore],['综合观察 MGS',g.mgs],['头部 CR3 (%)',e.concentration],['新书密度 (%)',e.signnewDensity],['名次可及性 (%)',e.accessibility],['需求榜信号',g.demandScore],['增长信号',g.growthSignal]])+`<p class="notice">缺失指标显示为 —；观察分不估计写作成功概率。</p><h3>代表作品</h3>${c.top5.map(b=>`<p>${bookButton(b)}</p>`).join('')}<h3>通用写作提示</h3><p>结合擅长的领域积累素材，研究具体作品，并小规模验证选题。</p>`);}
+async function research(tab='association_rules'){openDrawer('研究工具',`<div class="tabs">${Object.entries({association_rules:'榜单关联',clusters:'聚类画像',forecast:'实验预测',genre_tags:'题材共现',authors:'作者统计'}).map(([k,v])=>`<button data-research="${k}" class="${tab===k?'active':''}">${v}</button>`).join('')}</div><p id="researchStatus" class="notice">加载中…</p><div class="chart" id="research-chart"></div>`,true);const token=drawerEpoch;
+ if(tab==='authors'){document.querySelector('#researchStatus').textContent='历史累计榜单记录次数；并非作者人数';bar('research-chart',data.summary.authors.map(a=>({name:a.author,value:a.count})),'累计上榜次数');return;}
+ const r=await loadAnalysisFile(tab+'.json',data.snapshot.week);if(token!==drawerEpoch||!dialog.open)return;document.querySelector('#researchStatus').textContent=status(r);if(!r){document.querySelector('#research-chart').innerHTML='<p class="empty">本周分析不可用</p>';return;}researchRenderers[tab](r);}
+async function methods(){openDrawer('数据与方法','<p>正在读取分析状态…</p>');const token=drawerEpoch;const results=await Promise.all(['keywords','llm_insights','weekly_report','forecast'].map(k=>loadAnalysisFile(k+'.json',data.snapshot.week,true)));if(token!==drawerEpoch)return;const counts={};data.summary.heatScores.forEach(b=>counts[b.status]=(counts[b.status]||0)+1);body.innerHTML=detail([['数据周',data.snapshot.week],['采集时间',data.snapshot.scraped_at],['历史坏链接',data.snapshot.quality.invalid_urls||0],['累计收录周',data.index.total_weeks]])+`<h3>逐榜质量</h3>${Object.entries(data.snapshot.quality.rankings).map(([k,q])=>`<p>${rankLabel(k)}：${q.status==='complete'?'完整':'不完整'} · ${q.actual} 条</p>`).join('')}<h3>比较范围</h3><p>${esc(data.summary.comparison.previous_week||'暂无可比周')} · ${esc(Object.entries(data.summary.comparison.depths).map(([rt,n])=>rankLabel(rt)+' Top '+n).join('、'))}</p><h3>状态分布</h3><p>${esc(Object.entries(counts).map(([k,v])=>k+' '+v+' 本').join('、'))}</p><h3>分析来源</h3>${results.map((r,i)=>`<p>${['文本观察','LLM样本','周报','预测'][i]}：${esc(status(r))}${r?.sample?' · '+r.n_books+' 本头部样本':''}</p>`).join('')}<h3>指标解释</h3><p>热度累计各榜权重 / √名次。EFS 综合新书密度、竞争分散度和名次可及性；MGS 加入需求榜和同口径动量。CR3 为分类前三本书的热度占比。以上均为样本观察指标。</p>`;}
+async function faq(){openDrawer('报告问答','<p>正在读取预生成问答…</p>');const token=drawerEpoch,r=await loadAnalysisFile('weekly_report.json',data.snapshot.week,true);if(token!==drawerEpoch)return;body.innerHTML=`<p class="notice">${esc(status(r))} · 匹配预生成 FAQ，不实时调用模型</p>${(r?.faq||[]).map((f,i)=>`<p><button class="link" data-faq="${i}">${esc(f.q)}</button></p>`).join('')}<form id="faqForm"><input aria-label="报告问题" name="question" placeholder="输入报告相关问题"><button>查询</button></form><div id="answer" class="chat-answer"></div>`;const answer=f=>document.querySelector('#answer').textContent=f?`报告周：${r.week}。${f.a}`:'没有匹配的预生成答案。';body.querySelectorAll('[data-faq]').forEach(b=>b.onclick=()=>answer(r.faq[Number(b.dataset.faq)]));document.querySelector('#faqForm').onsubmit=e=>{e.preventDefault();const q=new FormData(e.target).get('question').trim();const items=(r?.faq||[]).map(f=>({f,score:(f.keywords||[]).filter(k=>q.includes(k)).length})).sort((a,b)=>b.score-a.score);answer(q&&items[0]?.score?items[0].f:null);};}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-book],[data-category],[data-drawer],[data-research],[data-section]');if(!b)return;if(b.dataset.section){e.preventDefault();document.getElementById(b.dataset.section)?.scrollIntoView();return;}if(b.dataset.book)bookDrawer(b.dataset.book);else if(b.dataset.category)categoryDrawer(b.dataset.category);else if(b.dataset.research)research(b.dataset.research);else ({research,methods,faq}[b.dataset.drawer])?.();});
+document.querySelector('#closeDrawer').onclick=closeDrawer;dialog.addEventListener('cancel',e=>{e.preventDefault();closeDrawer();});dialog.addEventListener('click',e=>{if(e.target===dialog&&e.clientX<dialog.getBoundingClientRect().left)closeDrawer();});
+document.querySelector('#menu').onclick=()=>{document.body.classList.add('nav-open');document.querySelector('#navShade').hidden=false;document.querySelector('nav a').focus();};document.querySelector('#navShade').onclick=()=>{document.body.classList.remove('nav-open');document.querySelector('#navShade').hidden=true;};
+window.addEventListener('hashchange',()=>{if(!data)return;states[view].scroll=content.scrollTop;const next=location.hash.slice(2);view=labels[next]?next:'rankings';if(!labels[next])history.replaceState(null,'','#/rankings');render();});
+try{data=await loadDashboard();document.querySelector('#week').textContent=data.snapshot.week;const missing=Object.values(data.snapshot.quality.rankings).filter(q=>q.status!=='complete').length;document.querySelector('#quality').textContent=missing?`缺 ${missing} 榜 · 详情`:'采集完整 · 详情';view=location.hash.slice(2);if(!labels[view]){view='rankings';history.replaceState(null,'','#/rankings');}await render();}catch(error){content.textContent='工作台暂不可用：'+error.message;}
+
+function closeNavigation(){document.body.classList.remove('nav-open');document.querySelector('#navShade').hidden=true;}
+document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',closeNavigation));
+document.addEventListener('keydown',e=>{if(!document.body.classList.contains('nav-open'))return;if(e.key==='Escape'){closeNavigation();document.querySelector('#menu').focus();}if(e.key==='Tab'){const links=[...document.querySelector('#sidebar').querySelectorAll('a,button')];const first=links[0],last=links.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});

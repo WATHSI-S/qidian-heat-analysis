@@ -5,26 +5,23 @@ FAQ generation, and structured report output.
 
 import json
 import logging
-import math
 import os
 import re
 import time
-from collections import Counter, defaultdict
-from datetime import datetime
-from pathlib import Path
-from typing import Optional
+from collections import Counter
+from contextvars import ContextVar
+
+from domain import DATA_DIR, RANK_LABELS, book_key, comparable, load_week, load_weeks
+from analysis.ai_client import AIClient, MODEL
+from analysis.metrics import category_totals, compare_categories
+from analysis.results import read_result, record_failure, write_result
 
 logger = logging.getLogger(__name__)
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = REPO_ROOT / "data"
-ANALYSIS_DIR = DATA_DIR / "analysis"
-
-DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1"
-DEEPSEEK_MODEL = "deepseek-chat"
 MAX_ROUNDS = 8
+_CONTEXT = ContextVar("agent_context", default=(DATA_DIR, None))
 
-SYSTEM_PROMPT = """你是"天机"，起点中文网的数据分析 Agent。你的任务是自主探索本周排行榜数据，撰写一份深度的网文创作风向分析报告。
+SYSTEM_PROMPT = """你是"天机"，起点中文网的数据分析 Agent。你的任务是自主探索指定周及更早的排行榜数据，撰写创作观察报告。缺榜与缺失值必须标为未知，不得当作零。只依据工具返回的数据，区分观察、推测与通用建议，不推断平台偏好或写作成功率。
 
 ## 可用工具
 你可以调用以下工具来获取数据：
@@ -109,7 +106,7 @@ TOOLS = [
                     "rank_type": {
                         "type": "string",
                         "description": "榜单类型：yuepiao/hotsales/readindex/recom/collect/signnewbook/newfans/vipup",
-                        "enum": ["yuepiao", "hotsales", "readindex", "recom", "collect", "signnewbook", "newfans", "vipup"]
+                        "enum": list(RANK_LABELS)
                     },
                     "n": {"type": "integer", "description": "返回前 N 本，默认 10，最大 20"}
                 },
@@ -162,74 +159,29 @@ TOOLS = [
     },
 ]
 
-RANK_LABELS = {
-    "yuepiao": "月票榜", "hotsales": "畅销榜", "readindex": "阅读指数榜",
-    "recom": "推荐榜", "collect": "收藏榜", "signnewbook": "签约新书榜",
-    "newfans": "书友榜", "vipup": "更新榜",
-}
-
-RANK_WEIGHTS = {
-    "yuepiao": 1.0, "hotsales": 0.95, "readindex": 0.85,
-    "recom": 0.8, "collect": 0.75, "signnewbook": 0.7, "newfans": 0.6, "vipup": 0.5,
-}
-
-
 def _get_client():
-    api_key = os.environ.get("OPENAI_API_KEY", "")
-    if not api_key:
-        raise ValueError("OPENAI_API_KEY environment variable not set")
-    try:
-        from openai import OpenAI
-    except ImportError:
-        raise ImportError("openai package not installed. Run: pip install openai")
-    return OpenAI(api_key=api_key, base_url=DEEPSEEK_BASE_URL)
+    return AIClient(max_calls=MAX_ROUNDS + 1)
 
 
-def _load_week(data_dir: Path, week_label: str = None) -> dict:
-    """Load a specific week or the latest week."""
-    if week_label:
-        path = data_dir / f"{week_label}.json"
-        if path.exists():
-            with open(path, encoding="utf-8") as f:
-                return json.load(f)
-        return None
-
-    weeks_files = sorted(
-        [f for f in data_dir.glob("*.json") if f.name != "index.json"],
-        key=lambda f: f.name
-    )
-    for fpath in reversed(weeks_files):
-        with open(fpath, encoding="utf-8") as f:
-            data = json.load(f)
-        if data.get("total", 0) >= 1000:
-            return data
-    return None
+def _load_week(data_dir, week_label=None):
+    bound_dir, target = _CONTEXT.get()
+    requested = week_label or target
+    if target and requested > target:
+        raise ValueError("Agent cannot read weeks after the target week")
+    return load_week(bound_dir, requested)
 
 
-def _load_all_weeks(data_dir: Path) -> list[dict]:
-    idx_path = data_dir / "index.json"
-    if not idx_path.exists():
-        return []
-    with open(idx_path, encoding="utf-8") as f:
-        idx = json.load(f)
-    weeks = []
-    for w in idx.get("weeks", []):
-        if w.get("total", 0) < 1000:
-            continue
-        fpath = data_dir / w["file"]
-        if fpath.exists():
-            with open(fpath, encoding="utf-8") as f:
-                weeks.append(json.load(f))
-    weeks.sort(key=lambda w: w["week"])
-    return weeks
+def _load_all_weeks(data_dir):
+    bound_dir, target = _CONTEXT.get()
+    return load_weeks(bound_dir, target)
 
 
-def _load_analysis_file(data_dir: Path, filename: str) -> dict:
-    path = data_dir / "analysis" / filename
-    if path.exists():
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    return {}
+def _load_analysis_file(data_dir, filename, week=None):
+    bound_dir, target = _CONTEXT.get()
+    requested = week or target or load_week(bound_dir)["week"]
+    if target and requested > target:
+        raise ValueError("Agent cannot read future analysis")
+    return read_result(bound_dir, requested, filename)
 
 
 # ── Tool implementations ──
@@ -253,7 +205,9 @@ def _tool_get_weekly_stats(week: str = None) -> str:
 
     return json.dumps({
         "week": data["week"],
-        "total_books": len(data["books"]),
+        "total_entries": len(data["books"]),
+        "total_books": len({book_key(b) for b in data["books"]}),
+        "quality": data["quality"],
         "unique_titles": len(set(b["title"] for b in data["books"])),
         "unique_authors": len(authors),
         "n_categories": len(categories),
@@ -262,25 +216,16 @@ def _tool_get_weekly_stats(week: str = None) -> str:
     }, ensure_ascii=False)
 
 
-def _tool_get_category_trend(category: str) -> str:
+def _tool_get_category_trend(category):
     weeks = _load_all_weeks(DATA_DIR)
-    if len(weeks) < 2:
-        return json.dumps({"error": "数据不足，至少需要 2 周"}, ensure_ascii=False)
-
+    complete = [w for w in weeks if w["quality"]["status"] == "complete"]
+    depths = {rt: min(w["quality"]["rankings"][rt]["depth"] for w in complete) for rt in RANK_LABELS} if complete else {}
     trend = []
     for w in weeks:
-        cat_books = [b for b in w["books"] if b.get("category") == category]
-        heat = 0.0
-        for b in cat_books:
-            wgt = RANK_WEIGHTS.get(b.get("rank_type", ""), 0.5)
-            heat += wgt / math.sqrt(max(b.get("rank", 200), 1))
-        trend.append({
-            "week": w["week"],
-            "book_count": len(cat_books),
-            "heat": round(heat, 2),
-        })
-
-    return json.dumps({"category": category, "trend": trend, "n_weeks": len(trend)}, ensure_ascii=False)
+        totals = category_totals([b for b in w["books"] if b["rank_type"] in depths and b["rank"] <= depths[b["rank_type"]]]) if w in complete else None
+        trend.append({"week": w["week"], "heat": totals.get(category, {}).get("heat", 0) if totals is not None else None,
+                      "status": w["quality"]["status"]})
+    return json.dumps({"category": category, "trend": trend, "comparison_depths": depths}, ensure_ascii=False)
 
 
 def _tool_get_top_books(week: str = None, rank_type: str = "yuepiao", n: int = 10) -> str:
@@ -288,7 +233,7 @@ def _tool_get_top_books(week: str = None, rank_type: str = "yuepiao", n: int = 1
     if not data:
         return json.dumps({"error": "周数据不可用"}, ensure_ascii=False)
 
-    n = min(n, 20)
+    n = max(1, min(n, 20))
     matched = [b for b in data["books"] if b.get("rank_type") == rank_type]
     matched.sort(key=lambda b: b.get("rank", 200))
 
@@ -310,19 +255,13 @@ def _tool_get_top_books(week: str = None, rank_type: str = "yuepiao", n: int = 1
     }, ensure_ascii=False)
 
 
-def _tool_get_keywords(week: str = None) -> str:
-    kw = _load_analysis_file(DATA_DIR, "keywords.json")
-    if not kw or not kw.get("top"):
-        all_kw = _load_analysis_file(DATA_DIR, "keywords.json")
-        return json.dumps(
-            kw.get("top", [])[:20] if kw else {"message": "关键词数据暂不可用"},
-            ensure_ascii=False
-        )
-    return json.dumps(kw.get("top", [])[:20], ensure_ascii=False)
+def _tool_get_keywords(week=None):
+    kw = _load_analysis_file(DATA_DIR, "keywords.json", week)
+    return json.dumps({"week": kw.get("week"), "top": kw.get("top", [])[:20], "status": kw.get("status", "unavailable")}, ensure_ascii=False)
 
 
 def _tool_get_genre_distribution(week: str = None) -> str:
-    gt = _load_analysis_file(DATA_DIR, "genre_tags.json")
+    gt = _load_analysis_file(DATA_DIR, "genre_tags.json", week)
     if not gt:
         return json.dumps({"message": "流派标签数据暂不可用"}, ensure_ascii=False)
 
@@ -334,47 +273,15 @@ def _tool_get_genre_distribution(week: str = None) -> str:
     }, ensure_ascii=False)
 
 
-def _tool_compare_weeks(week1: str, week2: str) -> str:
-    w1 = _load_week(DATA_DIR, week1)
-    w2 = _load_week(DATA_DIR, week2)
-    if not w1 or not w2:
-        return json.dumps({"error": "两周数据不完整"}, ensure_ascii=False)
-
-    keys1 = set((b["title"], b["author"]) for b in w1["books"])
-    keys2 = set((b["title"], b["author"]) for b in w2["books"])
-
-    new_books = keys2 - keys1
-    gone_books = keys1 - keys2
-    common = keys1 & keys2
-
-    # Category heat changes
-    cat_heat1 = Counter()
-    cat_heat2 = Counter()
-    for b in w1["books"]:
-        if b.get("category"):
-            wgt = RANK_WEIGHTS.get(b.get("rank_type", ""), 0.5)
-            cat_heat1[b["category"]] += wgt / math.sqrt(max(b.get("rank", 200), 1))
-    for b in w2["books"]:
-        if b.get("category"):
-            wgt = RANK_WEIGHTS.get(b.get("rank_type", ""), 0.5)
-            cat_heat2[b["category"]] += wgt / math.sqrt(max(b.get("rank", 200), 1))
-
-    changes = []
-    all_cats = set(list(cat_heat1.keys()) + list(cat_heat2.keys()))
-    for cat in all_cats:
-        d = round(cat_heat2.get(cat, 0) - cat_heat1.get(cat, 0), 2)
-        if abs(d) > 0.1:
-            changes.append({"category": cat, "heat_change": d, "prev": round(cat_heat1.get(cat, 0), 2), "cur": round(cat_heat2.get(cat, 0), 2)})
-    changes.sort(key=lambda x: x["heat_change"], reverse=True)
-
-    return json.dumps({
-        "week1": w1["week"], "week2": w2["week"],
-        "common_books": len(common),
-        "new_books": len(new_books),
-        "gone_books": len(gone_books),
-        "churn_rate": round((len(new_books) + len(gone_books)) / max(len(keys1), 1) * 100, 1),
-        "category_changes": changes[:15],
-    }, ensure_ascii=False)
+def _tool_compare_weeks(week1, week2):
+    previous, current = _load_week(DATA_DIR, week1), _load_week(DATA_DIR, week2)
+    old, new, depths = comparable(previous, current)
+    a, b = {book_key(x) for x in old}, {book_key(x) for x in new}
+    changes, _, _, _ = compare_categories(current, previous)
+    return json.dumps({"week1": week1, "week2": week2, "comparison_depths": depths,
+                       "common_books": len(a & b), "new_books": len(b - a), "gone_books": len(a - b),
+                       "churn_rate": round((1 - len(a & b) / len(a | b)) * 100, 1) if a | b else None,
+                       "category_changes": changes}, ensure_ascii=False)
 
 
 TOOL_EXECUTORS = {
@@ -400,8 +307,7 @@ def _run_react_loop(client, week_label: str) -> tuple[str, list[dict]]:
         logger.info("Agent round %d/%d", round_num, MAX_ROUNDS)
 
         try:
-            response = client.chat.completions.create(
-                model=DEEPSEEK_MODEL,
+            response = client.complete(
                 messages=messages,
                 tools=TOOLS,
                 temperature=0.7,
@@ -493,8 +399,7 @@ def _run_react_loop(client, week_label: str) -> tuple[str, list[dict]]:
     })
 
     try:
-        response = client.chat.completions.create(
-            model=DEEPSEEK_MODEL,
+        response = client.complete(
             messages=messages,
             temperature=0.7,
             max_tokens=4096,
@@ -506,7 +411,7 @@ def _run_react_loop(client, week_label: str) -> tuple[str, list[dict]]:
         return content, tool_call_log
     except Exception as e:
         logger.error("Final report generation failed: %s", e)
-        return f"## 本周概览\n\nAgent 分析过程中出现错误：{e}\n\n请稍后重试。", tool_call_log
+        raise RuntimeError("Agent report generation failed") from e
 
 
 def _extract_faq_from_report(report: str) -> list[dict]:
@@ -535,168 +440,22 @@ def _extract_faq_from_report(report: str) -> list[dict]:
     return faq
 
 
-def _generate_faqs_from_data(data_dir: Path, week_label: str) -> list[dict]:
-    """Generate structured FAQ pairs from data analysis results."""
-    faq = []
-    weeks = _load_all_weeks(data_dir)
-    latest = weeks[-1] if weeks else None
-
-    if not latest:
-        return faq
-
-    # FAQ 1: Overview
-    n_books = len(set((b["title"], b["author"]) for b in latest["books"]))
-    cats = Counter(b.get("category", "") for b in latest["books"])
-    top_cats = [c for c, _ in cats.most_common(5)]
-    faq.append({
-        "q": "本周上榜书籍的整体情况如何？",
-        "a": f"本周共有 {n_books} 本独立书籍上榜，覆盖 {len(cats)} 个品类。最热门的品类包括：{'、'.join(top_cats)}。整体市场活跃度较高，各品类竞争格局呈现差异化特征。",
-        "keywords": ["本周", "整体", "情况", "上榜", "书籍", "品类"],
-    })
-
-    # FAQ 2: Hottest category
-    if top_cats:
-        faq.append({
-            "q": f"本周最热门的品类是什么？",
-            "a": f"从榜单覆盖度来看，{'、'.join(top_cats[:3])} 是本周最热门的品类。这些品类的头部作品在多个榜单上均有斩获，显示出较强的市场号召力和读者付费意愿。",
-            "keywords": ["热门", "品类", top_cats[0] if top_cats else "玄幻"],
-        })
-
-    # FAQ 3-5: Genre tags
-    genre_tags = _load_analysis_file(data_dir, "genre_tags.json")
-    if genre_tags and genre_tags.get("global"):
-        top3 = genre_tags["global"][:3]
-        faq.append({
-            "q": "当前网文创作最流行哪些流派和元素？",
-            "a": "根据对书籍简介的文本分析，目前最流行的流派标签Top 3是：" + "、".join(t["tag"] + "(" + str(t["count"]) + "次)" for t in top3) + "。这说明读者对这些题材有持续的高需求，创作者可以考虑在这些方向上深耕或寻找差异化切入点。",
-            "keywords": ["流行", "流派", "元素", "标签", "创作"],
-        })
-
-    # FAQ 4: Keywords
-    keywords = _load_analysis_file(data_dir, "keywords.json")
-    if keywords and keywords.get("top"):
-        top_kw = keywords["top"][:5]
-        kw_str = "、".join(f'{k["token"]}' for k in top_kw)
-        faq.append({
-            "q": "从关键词来看，本周网文创作的热点是什么？",
-            "a": f"TF-IDF 关键词分析显示，本周高频关键词包括：{kw_str}。这些词汇反映了当前读者的阅读兴趣和创作热点，建议在创作中自然地融入这些热点元素，而非生硬堆砌。",
-            "keywords": ["关键词", "热点", "TF-IDF", "创作"],
-        })
-
-    # FAQ 5-6: Trend questions
-    if len(weeks) >= 2:
-        prev = weeks[-2]
-        common = set((b["title"], b["author"]) for b in latest["books"]) & set((b["title"], b["author"]) for b in prev["books"])
-        retention = round(len(common) / max(len(set((b["title"], b["author"]) for b in prev["books"])), 1) * 100, 1)
-        faq.append({
-            "q": "与上周相比，本周榜单有哪些变化？",
-            "a": f"本周书籍留存率约为 {retention}%。部分新面孔进入榜单说明市场对所有创作者仍有开放性，但头部作品的优势地位相对稳固。创作者应关注榜单变化中反映的读者口味迁移。",
-            "keywords": ["对比", "变化", "上周", "留存", "榜单"],
-        })
-
-        faq.append({
-            "q": "对于新人作者，应该选择什么品类入局？",
-            "a": f"建议关注签约新书榜中表现较好的品类，以及竞争集中度相对较低的品类。当前热门品类如{'、'.join(top_cats[:2]) if top_cats else '玄幻'}虽然读者基数大但竞争激烈，可考虑选择增长中的细分品类作为切入点。",
-            "keywords": ["新人", "作者", "入局", "选择", "品类", "签约"],
-        })
-
-    # FAQ 7-10: More specific insights
-    faq.append({
-        "q": "网文创作中如何选择金手指设定？",
-        "a": "根据书籍简介分析，'系统流'和'重生/穿越'是最常见的金手指设定。创作者可以考虑在经典金手指基础上加入创新元素，或结合两种以上的设定来创造新鲜感。关键在于金手指要与主线剧情深度融合，而非仅仅作为开篇噱头。",
-        "keywords": ["金手指", "设定", "系统", "重生", "穿越"],
-    })
-
-    faq.append({
-        "q": "如何在热门品类中做出差异化？",
-        "a": "在热门品类中脱颖而出的关键策略包括：① 找到品类内被忽略的子类型或交叉领域；② 在人物设定上做创新（如非常规主角身份）；③ 在叙事节奏上做差异化（快节奏打脸vs慢热布局）；④ 融合跨品类元素创造新鲜感。",
-        "keywords": ["差异化", "热门", "品类", "创新", "策略"],
-    })
-
-    faq.append({
-        "q": "当前网文市场的读者偏好有什么特征？",
-        "a": "从数据来看，读者偏好呈现两极分化趋势：一边是'快节奏、强爽感'的作品持续走强；另一边是'世界观扎实、人物立体'的作品具备长尾生命力。创作者应根据自身优势选择合适的定位，而非盲目追热点。",
-        "keywords": ["读者", "偏好", "市场", "特征", "趋势"],
-    })
-
-    faq.append({
-        "q": "签约新书榜对创作者有什么指导意义？",
-        "a": "签约新书榜反映了平台近期的签约偏好和扶持方向。该榜上榜书籍的主题和品类分布，代表了平台编辑对市场趋势的判断。创作者在开新书前，可以研究签约新书榜的品类构成，以此作为确定选题方向的参考依据之一。",
-        "keywords": ["签约", "新书", "平台", "扶持", "选题"],
-    })
-
-    return faq
-
-
-def run_agent_analysis(data_dir: Path = None, week_label: str = None) -> dict:
-    """Run ReAct Agent analysis and generate report + FAQ."""
-    if data_dir is None:
-        data_dir = DATA_DIR
-
-    analysis_dir = data_dir / "analysis"
-    analysis_dir.mkdir(parents=True, exist_ok=True)
-
-    api_key = os.environ.get("OPENAI_API_KEY", "")
-    if not api_key:
-        error_data = {"error": "API key not configured", "updated_at": datetime.now().isoformat()}
-        with open(analysis_dir / "agent_insights.json", "w", encoding="utf-8") as f:
-            json.dump(error_data, f, ensure_ascii=False, indent=2)
-        with open(analysis_dir / "agent_report.md", "w", encoding="utf-8") as f:
-            f.write("## AI Agent 分析暂不可用\n\nDeepSeek API Key 未配置，请设置 `OPENAI_API_KEY` 环境变量后重新运行。\n")
-        logger.warning("OPENAI_API_KEY not set, skipping agent analysis")
-        return error_data
-
-    # Determine week label
-    if not week_label:
-        latest = _load_week(data_dir)
-        if latest:
-            week_label = latest["week"]
-        else:
-            week_label = "未知周"
-
-    logger.info("=== Agent Analysis for %s ===", week_label)
-
+def run_agent_analysis(data_dir=None, week_label=None):
+    data_dir = data_dir or DATA_DIR
+    week = load_week(data_dir, week_label)["week"]
+    token = _CONTEXT.set((data_dir, week))
     try:
         client = _get_client()
-        report, tool_log = _run_react_loop(client, week_label)
-    except Exception as e:
-        logger.error("Agent analysis failed: %s", e)
-        error_data = {"error": str(e), "updated_at": datetime.now().isoformat()}
-        with open(analysis_dir / "agent_insights.json", "w", encoding="utf-8") as f:
-            json.dump(error_data, f, ensure_ascii=False, indent=2)
-        with open(analysis_dir / "agent_report.md", "w", encoding="utf-8") as f:
-            f.write(f"## AI Agent 分析失败\n\n错误信息：{e}\n\n请稍后重试。\n")
-        return error_data
-
-    # Extract FAQ from report or generate from data
-    faq_from_report = _extract_faq_from_report(report)
-    faq_from_data = _generate_faqs_from_data(data_dir, week_label)
-
-    # Merge FAQs: prefer report-extracted ones, fill with data-generated ones
-    faq = faq_from_report
-    existing_qs = {f["q"] for f in faq}
-    for f in faq_from_data:
-        if f["q"] not in existing_qs and len(faq) < 40:
-            faq.append(f)
-            existing_qs.add(f["q"])
-
-    # Save agent report
-    with open(analysis_dir / "agent_report.md", "w", encoding="utf-8") as f:
-        f.write(report)
-    logger.info("Saved agent_report.md (%d chars)", len(report))
-
-    # Save agent insights
-    insights = {
-        "updated_at": datetime.now().isoformat(),
-        "model": DEEPSEEK_MODEL,
-        "week": week_label,
-        "report": report,
-        "tool_calls_log": tool_log,
-        "n_tool_calls": len(tool_log),
-        "faq": faq,
-    }
-    with open(analysis_dir / "agent_insights.json", "w", encoding="utf-8") as f:
-        json.dump(insights, f, ensure_ascii=False, indent=2)
-    logger.info("Saved agent_insights.json (%d FAQ items)", len(faq))
-
-    return {"n_tool_calls": len(tool_log), "n_faq": len(faq), "report_length": len(report)}
+        report, tool_log = _run_react_loop(client, week)
+        if not report.strip():
+            raise ValueError("Empty agent report")
+        return write_result(data_dir, week, "agent_insights.json", {
+            "model": MODEL, "report": report, "tool_calls_log": tool_log,
+            "n_tool_calls": len(tool_log), "faq": _extract_faq_from_report(report),
+            "mode": "manual_exploration"}, [w["week"] for w in load_weeks(data_dir, week)])
+    except Exception as error:
+        logger.exception("Optional agent exploration failed")
+        return record_failure(data_dir, week, "agent_insights.json", type(error).__name__,
+                              "unavailable" if not os.environ.get("OPENAI_API_KEY") else "error")
+    finally:
+        _CONTEXT.reset(token)

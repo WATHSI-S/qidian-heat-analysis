@@ -2,22 +2,16 @@
 Text mining module: jieba segmentation, TF-IDF analysis, genre tag extraction.
 """
 
-import json
 import logging
 import re
 from collections import Counter, defaultdict
-from datetime import datetime
-from pathlib import Path
-from typing import Optional
 
 import jieba
 from sklearn.feature_extraction.text import TfidfVectorizer
+from domain import DATA_DIR, deduplicate, load_week
+from analysis.results import write_result
 
 logger = logging.getLogger(__name__)
-
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = REPO_ROOT / "data"
-ANALYSIS_DIR = DATA_DIR / "analysis"
 
 # ── Web novel domain dictionary ──
 
@@ -149,15 +143,18 @@ def segment_intros(books: list[dict]) -> list[list[str]]:
     return tokens_list
 
 
-def compute_tfidf_global(books: list[dict], tokenized: list[list[str]], top_n: int = 100) -> dict:
+def compute_tfidf_global(books: list[dict], tokenized: list[list[str]], top_n: int = 100, vectorizer=None) -> dict:
     """Compute TF-IDF across all book intros. Returns top_n keywords with scores and frequencies."""
     # Build corpus: space-joined tokens per book
     corpus = [" ".join(tokens) for tokens in tokenized]
     non_empty = sum(1 for t in corpus if t)
 
-    vectorizer = TfidfVectorizer(max_features=2000, token_pattern=r"(?u)\b\w+\b")
     try:
-        tfidf_matrix = vectorizer.fit_transform(corpus)
+        if vectorizer is None:
+            vectorizer = TfidfVectorizer(max_features=2000, token_pattern=r"(?u)\b\w+\b")
+            tfidf_matrix = vectorizer.fit_transform(corpus)
+        else:
+            tfidf_matrix = vectorizer.transform(corpus)
     except ValueError:
         logger.warning("TF-IDF: corpus too sparse or empty")
         return {"tokens": [], "scores": [], "n_books": len(books), "error": "corpus too sparse"}
@@ -190,7 +187,7 @@ def compute_tfidf_global(books: list[dict], tokenized: list[list[str]], top_n: i
 
 
 def compute_tfidf_per_category(
-    books: list[dict], tokenized: list[list[str]], min_books: int = 10, top_n: int = 30
+    books: list[dict], tokenized: list[list[str]], min_books: int = 10, top_n: int = 30, vectorizer=None
 ) -> dict:
     """Compute TF-IDF per category, using ALL intros as the background corpus."""
     categories: dict[str, list[str]] = defaultdict(list)
@@ -203,12 +200,17 @@ def compute_tfidf_per_category(
     result = {}
     all_corpus = [" ".join(t) if t else "" for t in tokenized]
 
+    if vectorizer is None:
+        vectorizer = TfidfVectorizer(max_features=2000, token_pattern=r"(?u)\b\w+\b")
+        try:
+            vectorizer.fit(all_corpus)
+        except ValueError:
+            return {}
+
     for cat, docs in sorted(categories.items()):
         if len(docs) < min_books:
             continue
         try:
-            vectorizer = TfidfVectorizer(max_features=1000, token_pattern=r"(?u)\b\w+\b")
-            vectorizer.fit(all_corpus)
             tfidf_matrix = vectorizer.transform(docs)
         except ValueError:
             continue
@@ -272,81 +274,28 @@ def extract_genre_tags(books: list[dict]) -> dict:
     }
 
 
-def _load_and_deduplicate(data_dir: Path) -> list[dict]:
-    """Load all weekly JSON files, deduplicate books by (title, author)."""
-    seen: set[tuple[str, str]] = set()
-    books = []
-
-    for fpath in sorted(data_dir.glob("*.json")):
-        if fpath.name == "index.json":
-            continue
-        try:
-            with open(fpath, "r", encoding="utf-8") as f:
-                snap = json.load(f)
-        except (json.JSONDecodeError, KeyError):
-            continue
-
-        # Exclude placeholder data (W20-W21 have fake intros)
-        if snap.get("total", 0) < 1000:
-            logger.info("Skipping %s (total=%d, likely placeholder data)", fpath.name, snap.get("total", 0))
-            continue
-
-        for book in snap.get("books", []):
-            key = (book.get("title", ""), book.get("author", ""))
-            if key not in seen:
-                seen.add(key)
-                books.append(book)
-
-    logger.info("Loaded %d unique books from %s", len(books), data_dir)
-    return books
+def _load_and_deduplicate(data_dir, week_label=None):
+    return deduplicate(load_week(data_dir, week_label)["books"])
 
 
-def run_text_mining(data_dir: Path = None, week_label: str = None) -> dict:
-    """Run all text mining analyses and save results to data/analysis/."""
-    if data_dir is None:
-        data_dir = DATA_DIR
-
-    analysis_dir = data_dir / "analysis"
-    analysis_dir.mkdir(parents=True, exist_ok=True)
-
+def run_text_mining(data_dir=None, week_label=None):
+    data_dir = data_dir or DATA_DIR
+    snapshot = load_week(data_dir, week_label)
+    week = snapshot["week"]
+    books = deduplicate(snapshot["books"])
     load_custom_dict()
-
-    # Load and deduplicate
-    books = _load_and_deduplicate(data_dir)
-    logger.info("Text mining on %d unique books", len(books))
-
-    # Segment
-    tokenized = segment_intros(books)
-    non_empty = sum(1 for t in tokenized if t)
-    logger.info("Tokenized: %d/%d non-empty", non_empty, len(books))
-
-    # TF-IDF global
-    logger.info("Computing global TF-IDF...")
-    keywords = compute_tfidf_global(books, tokenized)
-    keywords["updated_at"] = datetime.now().isoformat()
-    with open(analysis_dir / "keywords.json", "w", encoding="utf-8") as f:
-        json.dump(keywords, f, ensure_ascii=False, indent=2)
-    logger.info("Saved keywords.json (%d tokens)", len(keywords.get("tokens", [])))
-
-    # TF-IDF per category
-    logger.info("Computing per-category TF-IDF...")
-    cat_keywords = compute_tfidf_per_category(books, tokenized)
-    cat_output = {"updated_at": datetime.now().isoformat(), "categories": cat_keywords}
-    with open(analysis_dir / "category_keywords.json", "w", encoding="utf-8") as f:
-        json.dump(cat_output, f, ensure_ascii=False, indent=2)
-    logger.info("Saved category_keywords.json (%d categories)", len(cat_keywords))
-
-    # Genre tags
-    logger.info("Extracting genre tags...")
-    genre_tags = extract_genre_tags(books)
-    genre_tags["updated_at"] = datetime.now().isoformat()
-    with open(analysis_dir / "genre_tags.json", "w", encoding="utf-8") as f:
-        json.dump(genre_tags, f, ensure_ascii=False, indent=2)
-    logger.info("Saved genre_tags.json (%d tags)", len(genre_tags.get("global", [])))
-
-    return {
-        "n_books": len(books),
-        "n_keywords": len(keywords.get("tokens", [])),
-        "n_genre_tags": len(genre_tags.get("global", [])),
-        "n_categories": len(cat_keywords),
-    }
+    tokens = segment_intros(books)
+    vectorizer = TfidfVectorizer(max_features=2000, token_pattern=r"(?u)\b\w+\b")
+    try:
+        vectorizer.fit([" ".join(words) for words in tokens])
+    except ValueError:
+        keywords, categories = {"n_books": len(books), "top": [], "tokens": [], "scores": []}, {}
+    else:
+        keywords = compute_tfidf_global(books, tokens, vectorizer=vectorizer)
+        categories = compute_tfidf_per_category(books, tokens, vectorizer=vectorizer)
+    genres = extract_genre_tags(books)
+    write_result(data_dir, week, "keywords.json", keywords)
+    write_result(data_dir, week, "category_keywords.json", {"categories": categories})
+    write_result(data_dir, week, "genre_tags.json", genres)
+    return {"status": "ok", "n_books": len(books), "n_keywords": len(keywords["tokens"]),
+            "n_categories": len(categories), "n_genre_tags": len(genres["global"])}

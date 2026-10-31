@@ -37,7 +37,10 @@ def main():
     logger.info("Starting weekly crawl (dry_run=%s, max_per_rank=%d)",
                 args.dry_run, args.max_per_rank)
 
-    books = scrape_all_rankings(max_per_rank=args.max_per_rank)
+    if args.max_per_rank < 1:
+        parser.error("--max-per-rank must be positive")
+    result = scrape_all_rankings(max_per_rank=args.max_per_rank)
+    books = result["books"]
     logger.info("Total books scraped: %d", len(books))
 
     if args.dry_run:
@@ -50,7 +53,12 @@ def main():
         logger.error("No books scraped — check network or page selectors")
         sys.exit(1)
 
-    saved_path = save_weekly_snapshot(books)
+    saved_path = save_weekly_snapshot(books, rankings=result["rankings"])
+    for rank, outcome in result["rankings"].items():
+        logger.info("%s: %s (%d/%d), %s", rank, outcome["status"], outcome["actual"], outcome["requested"], outcome["reason"])
+    if saved_path.parent.name == "partial":
+        logger.error("Incomplete crawl archived at %s; existing snapshots retained", saved_path)
+        sys.exit(1)
     update_index()
     logger.info("Done. Data saved to %s", saved_path)
 

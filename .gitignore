@@ -6,3 +6,10 @@ docs/css/
 docs/images/
 docs/picture/
 docs/scripts/
+
+dist/
+docs/data/
+.pytest_cache/
+data/cache/
+data/partial/
+tests/fixtures/sample/

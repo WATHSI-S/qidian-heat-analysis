@@ -1,133 +1,81 @@
 #!/usr/bin/env python3
-"""
-Analysis pipeline: orchestrates text mining, LLM analysis, data mining, and AI agent.
-
-Usage:
-    python pipeline.py                  # Run all four modules
-    python pipeline.py --text-only      # Run only text mining
-    python pipeline.py --skip-text-mining  # Run only LLM analysis
-    python pipeline.py --data-mining-only  # Run only data mining
-    python pipeline.py --agent-only     # Run only AI agent analysis
-    python pipeline.py --skip-data-mining  # Skip data mining
-    python pipeline.py --skip-agent     # Skip AI agent analysis
-"""
-
+"""Explicit analysis stages; default all excludes optional agent exploration."""
 import argparse
+import importlib
+import json
 import logging
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from domain import DATA_DIR, atomic_json, load_week
 
-from analysis.text_mining import run_text_mining
-from analysis.llm_analyzer import run_llm_analysis
-from analysis.data_mining import run_data_mining
-from analysis.agent import run_agent_analysis
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
-logger = logging.getLogger("pipeline")
-
-DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
+STAGES = {
+    "summary": ("metrics", "build_summary"),
+    "text": ("text_mining", "run_text_mining"),
+    "data": ("data_mining", "run_data_mining"),
+    "llm": ("llm_analyzer", "run_llm_analysis"),
+    "report": ("llm_analyzer", "run_report"),
+    "agent": ("agent", "run_agent_analysis"),
+}
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Run text mining + LLM + data mining + agent analysis")
-    parser.add_argument("--week", type=str, help="Week label (e.g. 2026-W27)")
-    parser.add_argument("--text-only", action="store_true", help="Run only text mining")
-    parser.add_argument("--skip-text-mining", action="store_true", help="Skip text mining")
-    parser.add_argument("--data-mining-only", action="store_true", help="Run only data mining")
-    parser.add_argument("--agent-only", action="store_true", help="Run only AI agent analysis")
-    parser.add_argument("--skip-data-mining", action="store_true", help="Skip data mining")
-    parser.add_argument("--skip-agent", action="store_true", help="Skip AI agent analysis")
-    args = parser.parse_args()
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("stage", nargs="?", choices=["all", *STAGES])
+    parser.add_argument("--week")
+    parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
+    only = parser.add_mutually_exclusive_group()
+    for flag in ("text-only", "data-mining-only", "agent-only", "skip-text-mining"):
+        only.add_argument("--" + flag, action="store_true")
+    parser.add_argument("--skip-data-mining", action="store_true")
+    parser.add_argument("--skip-agent", action="store_true")
+    args = parser.parse_args(argv)
+    legacy = [(args.text_only, "text"), (args.data_mining_only, "data"),
+              (args.agent_only, "agent"), (args.skip_text_mining, "llm")]
+    chosen = next((stage for enabled, stage in legacy if enabled), None)
+    if chosen and args.stage:
+        parser.error("Do not combine a stage with legacy mode flags")
+    args.stage = chosen or args.stage or "all"
+    if args.skip_data_mining and args.stage != "all":
+        parser.error("--skip-data-mining is only valid with all")
+    if args.skip_agent and args.stage == "agent":
+        parser.error("Conflicting agent options")
+    if chosen:
+        logging.warning("Legacy mode flag is deprecated; use stage %s", chosen)
+    return args
 
-    data_dir = DATA_DIR
-    analysis_dir = data_dir / "analysis"
-    analysis_dir.mkdir(parents=True, exist_ok=True)
 
-    # ── Data mining only ──
-    if args.data_mining_only:
-        logger.info("=== Data Mining ===")
+def main(argv=None):
+    args = parse_args(argv)
+    week = load_week(args.data_dir, args.week)["week"]
+    stages = list(STAGES)[:-1] if args.stage == "all" else [args.stage]
+    if args.skip_data_mining and "data" in stages:
+        stages.remove("data")
+    outcomes = {}
+    failed = False
+    for stage in stages:
+        module, function = STAGES[stage]
         try:
-            dm_result = run_data_mining(data_dir, args.week)
-            logger.info("Data mining done: %s", dm_result)
-        except Exception as e:
-            logger.error("Data mining failed: %s", e)
-        return
-
-    # ── Agent only ──
-    if args.agent_only:
-        logger.info("=== AI Agent Analysis ===")
-        try:
-            ag_result = run_agent_analysis(data_dir, args.week)
-            logger.info("Agent done: %s", ag_result)
-        except Exception as e:
-            logger.error("Agent analysis failed: %s", e)
-            logger.info("Pipeline continues (Agent is non-blocking)")
-        return
-
-    if args.skip_text_mining:
-        # ── LLM only ──
-        logger.info("=== LLM Analysis ===")
-        try:
-            result = run_llm_analysis(data_dir, args.week)
-            logger.info("LLM done: %s", result)
-        except Exception as e:
-            logger.error("LLM analysis failed: %s", e)
-            logger.info("Pipeline continues (LLM is non-blocking)")
-        return
-
-    # ── Text mining ──
-    logger.info("=== Text Mining ===")
-    try:
-        tm_result = run_text_mining(data_dir, args.week)
-        logger.info(
-            "Text mining done: %d books, %d keywords, %d categories, %d genre tags",
-            tm_result.get("n_books", 0),
-            tm_result.get("n_keywords", 0),
-            tm_result.get("n_categories", 0),
-            tm_result.get("n_genre_tags", 0),
-        )
-    except Exception as e:
-        logger.error("Text mining failed: %s", e)
-        sys.exit(1)
-
-    if args.text_only:
-        logger.info("Text-only mode: skipping LLM, data mining, and agent analysis")
-        return
-
-    # ── Data mining ──
-    if not args.skip_data_mining:
-        logger.info("=== Data Mining ===")
-        try:
-            dm_result = run_data_mining(data_dir, args.week)
-            logger.info("Data mining done: %s", dm_result)
-        except Exception as e:
-            logger.error("Data mining failed: %s", e)
-            logger.info("Pipeline continues (Data mining is non-blocking)")
-
-    # ── LLM analysis ──
-    logger.info("=== LLM Analysis ===")
-    try:
-        llm_result = run_llm_analysis(data_dir, args.week)
-        logger.info("LLM done: %s", llm_result)
-    except Exception as e:
-        logger.error("LLM analysis failed: %s", e)
-        logger.info("Pipeline continues (LLM is non-blocking)")
-
-    # ── AI Agent analysis ──
-    if not args.skip_agent:
-        logger.info("=== AI Agent Analysis ===")
-        try:
-            ag_result = run_agent_analysis(data_dir, args.week)
-            logger.info("Agent done: %s", ag_result)
-        except Exception as e:
-            logger.error("Agent analysis failed: %s", e)
-            logger.info("Pipeline continues (Agent is non-blocking)")
+            result = getattr(importlib.import_module("analysis." + module), function)(args.data_dir, week)
+            statuses = [result.get("status")] if stage != "data" else [v.get("status") for v in result.values()]
+            status = "error" if any(s in ("error", "unavailable") for s in statuses) else "partial" if "partial" in statuses else "ok"
+            outcomes[stage] = {"status": status}
+        except Exception as error:
+            logging.exception("Stage %s failed", stage)
+            outcomes[stage] = {"status": "error", "message": type(error).__name__}
+            status = "error"
+        print(json.dumps({"week": week, "stage": stage, **outcomes[stage]}, ensure_ascii=False))
+        if status == "error":
+            failed = True
+            if stage in ("summary", "text"):
+                break
+    run_path = args.data_dir / "analysis" / week / "run.json"
+    previous = json.loads(run_path.read_text(encoding="utf-8")) if run_path.exists() else {"stages": {}}
+    atomic_json(run_path, {"week": week, "stages": {**previous["stages"], **outcomes}})
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":
-    main()
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    raise SystemExit(main())

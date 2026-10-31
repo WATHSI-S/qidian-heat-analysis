@@ -1,0 +1,9 @@
+{
+  "name": "qidian-heat-analysis",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/frontend.test.js",
+    "build": "python scripts/build_site.py"
+  }
+}

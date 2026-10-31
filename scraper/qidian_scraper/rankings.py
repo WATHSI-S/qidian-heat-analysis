@@ -4,26 +4,19 @@ Qidian ranking page scraper — uses Playwright to bypass JS anti-bot probe.
 
 import asyncio
 import logging
+import math
 import random
 from typing import Optional
 
 from bs4 import BeautifulSoup, Tag
 from playwright.async_api import async_playwright, Browser, Page
+from domain import RANK_LABELS, book_key, book_url
 
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://www.qidian.com"
 
-RANK_PAGES = {
-    "yuepiao": "/rank/yuepiao/",          # 月票榜
-    "hotsales": "/rank/hotsales/",         # 畅销榜
-    "readindex": "/rank/readindex/",       # 阅读指数榜
-    "recom": "/rank/recom/",               # 推荐榜
-    "collect": "/rank/collect/",           # 收藏榜
-    "newfans": "/rank/newfans/",           # 书友榜
-    "vipup": "/rank/vipup/",               # 更新榜
-    "signnewbook": "/rank/signnewbook/",   # 签约作者新书榜
-}
+RANK_PAGES = {key: f"/rank/{key}/" for key in RANK_LABELS}
 
 MAX_BOOKS_PER_RANK = 200
 PAGE_TIMEOUT = 30000  # ms
@@ -40,10 +33,13 @@ async def _new_page(browser: Browser) -> Page:
         locale="zh-CN",
         viewport={"width": 1920, "height": 1080},
     )
-    page = await context.new_page()
-    # Block images & fonts to speed up scraping
-    await page.route("**/*.{png,jpg,jpeg,gif,svg,woff,woff2,ttf,ico}", lambda route: route.abort())
-    return page
+    try:
+        page = await context.new_page()
+        await page.route("**/*.{png,jpg,jpeg,gif,svg,woff,woff2,ttf,ico}", lambda route: route.abort())
+        return page
+    except Exception:
+        await context.close()
+        raise
 
 
 def _text(el: Optional[Tag], default: str = "") -> str:
@@ -67,9 +63,9 @@ def _parse_book_item(el: Tag, rank_type: str) -> Optional[dict]:
             return None
 
         title = _text(name_tag)
-        href = name_tag.get("href", "")
-        if href and not href.startswith("http"):
-            href = "https:" + href if href.startswith("//") else BASE_URL + href
+        href = book_url(name_tag.get("href", ""))
+        if not title or not href:
+            return None
 
         # Author — <a class="name"> inside <p class="author">
         author_tag = (
@@ -87,10 +83,10 @@ def _parse_book_item(el: Tag, rank_type: str) -> Optional[dict]:
         if author_p:
             cat_links = author_p.select("a")
             for a in cat_links:
-                href = a.get("href", "")
+                category_href = a.get("href", "")
                 cls = a.get("class", [])
                 # Skip the author link and sub-category link
-                if "name" not in cls and "go-sub-type" not in cls and "/author/" not in href:
+                if "name" not in cls and "go-sub-type" not in cls and "/author/" not in category_href:
                     cat_tag = a
                     break
         category = _text(cat_tag)
@@ -104,7 +100,9 @@ def _parse_book_item(el: Tag, rank_type: str) -> Optional[dict]:
 
         # Intro
         intro_tag = el.select_one("p.intro") or el.select_one(".intro") or el.select_one("[class*='desc']")
-        intro = _text(intro_tag)[:120]
+        intro = _text(intro_tag)
+        if not author:
+            return None
 
         return {
             "title": title,
@@ -113,6 +111,7 @@ def _parse_book_item(el: Tag, rank_type: str) -> Optional[dict]:
             "status": status,
             "intro": intro,
             "url": href,
+            "book_id": href.rstrip("/").split("/")[-1],
             "rank_type": rank_type,
         }
     except Exception:
@@ -120,102 +119,85 @@ def _parse_book_item(el: Tag, rank_type: str) -> Optional[dict]:
         return None
 
 
-async def _scrape_rank_page(browser: Browser, rank_type: str, max_books: int = MAX_BOOKS_PER_RANK) -> list[dict]:
-    """Scrape a single ranking page, including pagination. Retries on anti-bot probe."""
-    rank_path = RANK_PAGES[rank_type]
-    url = BASE_URL + rank_path
-    logger.info("Scraping %s: %s", rank_type, url)
-
-    import asyncio as aio
-
-    MAX_RETRIES = 3
-    for attempt in range(MAX_RETRIES):
-        page = await _new_page(browser)
-        results = []
-
+async def _scrape_rank_page(browser: Browser, rank_type: str, max_books: int = MAX_BOOKS_PER_RANK) -> dict:
+    """Return records and an explicit per-ranking collection outcome."""
+    if max_books < 1:
+        raise ValueError("max_books must be positive")
+    url = BASE_URL + RANK_PAGES[rank_type]
+    best = {"books": [], "requested": max_books, "actual": 0,
+            "status": "failed", "reason": "not_started"}
+    for attempt in range(3):
+        page = None
+        records, seen, pages = [], set(), set()
+        reason, complete = "page_limit", False
         try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT)
-
-            # Wait for real book list items to render (anti-bot probe may delay this)
-            try:
-                await page.wait_for_selector("li[data-rid]", timeout=20000)
-            except Exception:
-                # Check if we got the anti-bot probe page
-                html = await page.content()
-                if "probe" in html.lower():
-                    logger.warning("%s: anti-bot probe page detected, retry %d/%d",
-                                   rank_type, attempt + 1, MAX_RETRIES)
-                    await page.close()
-                    await aio.sleep(2 * (attempt + 1))
-                    continue
-                logger.warning("%s: selector wait timed out, trying fallback...", rank_type)
-
-            html = await page.content()
-            soup = BeautifulSoup(html, "lxml")
-            book_selector = _find_working_selector(soup)
-
-            # If fallback-only matched and no real books found, likely probe
-            if book_selector == "li":
-                sample = soup.select("li")
-                has_books = any(
-                    item.select_one("h2 a") or item.select_one("p.author")
-                    for item in sample[:20]
-                )
-                if not has_books and attempt < MAX_RETRIES - 1:
-                    logger.warning("%s: page has no book items, probe likely, retry %d/%d",
-                                   rank_type, attempt + 1, MAX_RETRIES)
-                    await page.close()
-                    await aio.sleep(2 * (attempt + 1))
-                    continue
-
-            for page_num in range(1, 10):  # max 10 pages
-                if page_num > 1:
-                    await page.goto(f"{url}?page={page_num}", wait_until="domcontentloaded", timeout=PAGE_TIMEOUT)
-                    await page.wait_for_timeout(2000 + random.randint(0, 2000))
-                    html = await page.content()
-                    soup = BeautifulSoup(html, "lxml")
-
-                items = soup.select(book_selector)
+            page = await _new_page(browser)
+            for number in range(1, math.ceil(max_books / 20) + 1):
+                await page.goto(url if number == 1 else f"{url}?page={number}",
+                                wait_until="domcontentloaded", timeout=PAGE_TIMEOUT)
+                try:
+                    await page.wait_for_selector("li[data-rid]", timeout=20000)
+                except Exception:
+                    pass  # Validate rendered content below, including explicit empty states.
+                soup = BeautifulSoup(await page.content(), "lxml")
+                selector = _find_working_selector(soup)
+                items = soup.select(selector) if selector else []
+                pagination = soup.select_one(".lbf-pagination, .pagination")
+                next_link = soup.select_one("a.lbf-pagination-next:not(.lbf-pagination-disabled):not(.disabled)")
+                disabled_next = soup.select_one(".lbf-pagination-next.lbf-pagination-disabled, .lbf-pagination-next.disabled, [aria-label='下一页'][aria-disabled='true']")
                 if not items:
+                    complete = bool(soup.select_one(".no-data, .no-result, .null-book"))
+                    reason = "source_end" if complete else "invalid_or_probe_page"
                     break
-
-                for item in items:
-                    if len(results) >= max_books:
-                        break
+                parsed = []
+                for offset, item in enumerate(items):
                     book = _parse_book_item(item, rank_type)
-                    if book:
-                        book["rank"] = len(results) + 1
-                        results.append(book)
-
-                logger.info("  Page %d: %d books (total: %d)", page_num, len(items), len(results))
-
-                if len(items) < 20 or len(results) >= max_books:
+                    if not book:
+                        continue
+                    position = item.get("data-rid", "")
+                    book["rank"] = int(position) if str(position).isdigit() else (number - 1) * 20 + offset + 1
+                    if book["rank"] <= max_books:
+                        parsed.append(book)
+                fingerprint = tuple(book_key(book) for book in parsed)
+                if not parsed or fingerprint in pages:
+                    reason = "duplicate_or_invalid_page"
                     break
-
-            # Success — got real data
-            if results:
-                logger.info("Scraped %d books from %s ranking", len(results), rank_type)
-                return results
-
-            # No results but no probe detected — maybe empty page
-            if attempt < MAX_RETRIES - 1:
-                logger.warning("%s: 0 results without probe detection, retry %d/%d",
-                               rank_type, attempt + 1, MAX_RETRIES)
-            else:
-                logger.warning("Scraped %d books from %s ranking (all attempts exhausted)",
-                               len(results), rank_type)
-
-        except Exception as e:
-            logger.error("Error scraping %s (attempt %d/%d): %s",
-                         rank_type, attempt + 1, MAX_RETRIES, e)
+                pages.add(fingerprint)
+                if any(book_key(book) in seen for book in parsed):
+                    reason = "duplicate_book"
+                    break
+                for book in parsed:
+                    seen.add(book_key(book))
+                    records.append(book)
+                positions = sorted(b["rank"] for b in records)
+                contiguous = positions == list(range(1, len(records) + 1))
+                if len(records) >= max_books:
+                    complete, reason = contiguous, "requested_limit" if contiguous else "rank_gaps"
+                    break
+                if disabled_next or (len(items) < 20 and pagination and not next_link):
+                    complete, reason = contiguous, "source_end" if contiguous else "rank_gaps"
+                    break
+                if number < math.ceil(max_books / 20):
+                    await page.wait_for_timeout(random.randint(2000, 4000))
+            outcome = {"books": records, "requested": max_books, "actual": len(records),
+                       "status": "complete" if complete else "partial" if records else "failed",
+                       "reason": reason, "attempts": attempt + 1}
+        except Exception as error:
+            outcome = {"books": records, "requested": max_books, "actual": len(records),
+                       "status": "partial" if records else "failed", "reason": str(error),
+                       "attempts": attempt + 1}
         finally:
-            await page.close()
-
-        if attempt < MAX_RETRIES - 1:
-            await aio.sleep(2 * (attempt + 1))
-
-    logger.error("Failed to scrape %s after %d retries, returning 0 results", rank_type, MAX_RETRIES)
-    return []
+            if page is not None:
+                await page.context.close()
+        if outcome["status"] == "complete":
+            return outcome
+        if len(outcome["books"]) >= len(best["books"]):
+            best = outcome
+        logger.warning("%s attempt %d: %s (%d records)", rank_type, attempt + 1,
+                       outcome["reason"], outcome["actual"])
+        if attempt < 2:
+            await asyncio.sleep(2 * (attempt + 1))
+    return best
 
 
 def _find_working_selector(soup: BeautifulSoup) -> str:
@@ -236,14 +218,13 @@ def _find_working_selector(soup: BeautifulSoup) -> str:
     ]
     for sel in candidates:
         items = soup.select(sel)
-        if len(items) >= 10:
+        if items and any(_parse_book_item(item, "yuepiao") for item in items):
             logger.info("Using selector: %s (matched %d items)", sel, len(items))
             return sel
-    logger.warning("No good selector found, falling back to generic 'li'")
-    return "li"
+    return ""
 
 
-def scrape_all_rankings(max_per_rank: int = MAX_BOOKS_PER_RANK) -> list[dict]:
+def scrape_all_rankings(max_per_rank: int = MAX_BOOKS_PER_RANK) -> dict:
     """Scrape all configured ranking pages. Synchronous entry point."""
     async def _run():
         async with async_playwright() as pw:
@@ -251,7 +232,7 @@ def scrape_all_rankings(max_per_rank: int = MAX_BOOKS_PER_RANK) -> list[dict]:
                 headless=True,
                 args=["--disable-blink-features=AutomationControlled", "--no-sandbox"],
             )
-            all_books = []
+            all_books, outcomes = [], {}
             rank_types = list(RANK_PAGES.keys())
             try:
                 for i, rank_type in enumerate(rank_types):
@@ -260,12 +241,14 @@ def scrape_all_rankings(max_per_rank: int = MAX_BOOKS_PER_RANK) -> list[dict]:
                         logger.info("Waiting %.1fs before next ranking...", delay)
                         await asyncio.sleep(delay)
                     try:
-                        books = await _scrape_rank_page(browser, rank_type, max_books=max_per_rank)
-                        all_books.extend(books)
+                        result = await _scrape_rank_page(browser, rank_type, max_books=max_per_rank)
+                        all_books.extend(result["books"])
+                        outcomes[rank_type] = {k: v for k, v in result.items() if k != "books"}
                     except Exception as e:
+                        outcomes[rank_type] = {"requested": max_per_rank, "actual": 0, "status": "failed", "reason": str(e)}
                         logger.error("Failed to scrape %s: %s", rank_type, e)
             finally:
                 await browser.close()
-            return all_books
+            return {"books": all_books, "rankings": outcomes}
 
     return asyncio.run(_run())
