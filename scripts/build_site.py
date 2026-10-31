@@ -76,6 +76,24 @@ def build_site(source=ROOT, output=None, optional=True):
         target = output / file
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source / "docs" / file, target)
+    # New HTML must not reuse an older deployment's cached styles or scripts.
+    for module, dependencies in (("js/research.js", ("js/shared.js",)),
+                                 ("app.js", ("js/shared.js", "js/research.js"))):
+        path = output / module
+        script = path.read_text(encoding="utf-8")
+        for dependency in dependencies:
+            relative = './' + (Path(dependency).name if module.startswith("js/") else dependency)
+            version = hashlib.sha256((output / dependency).read_bytes()).hexdigest()[:12]
+            script = script.replace("'" + relative + "'", "'" + relative + '?v=' + version + "'")
+        path.write_text(script, encoding="utf-8")
+    for page in PAGES:
+        path = output / (page + ".html")
+        html = path.read_text(encoding="utf-8")
+        for asset in ASSETS:
+            if asset.endswith((".css", ".js")):
+                version = hashlib.sha256((output / asset).read_bytes()).hexdigest()[:12]
+                html = html.replace('="' + asset + '"', '="' + asset + '?v=' + version + '"')
+        path.write_text(html, encoding="utf-8")
     data_dir = output / "data"
     for snapshot in weeks:
         atomic_json(data_dir / (snapshot["week"] + ".json"), snapshot)

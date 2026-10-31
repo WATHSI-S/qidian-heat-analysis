@@ -23,6 +23,9 @@ def test_build_uses_allowlist_and_preserves_raw_history(tmp_path):
     assert raw == {p.name: p.read_bytes() for p in (root / "data").glob("????-W??.json")}
     manifest = json.loads((output / "deployment-manifest.json").read_text(encoding="utf-8"))
     assert "vendor/echarts.min.js" in manifest["files"]
+    html = (output / "index.html").read_text(encoding="utf-8")
+    assert 'href="style.css?v=' in html
+    assert 'src="app.js?v=' in html
     # Rebuilding the same output remains valid and does not duplicate stale artifacts.
     builder.build_site(root, output, optional=False)
     builder.verify_site(output, check_hashes=True)
