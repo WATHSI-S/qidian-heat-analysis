@@ -89,7 +89,7 @@ LLM 按八榜轮流选择头部书籍，去重后最多 120 本，每批 30 本�
 ## 验证
 
 ```bash
-python -m pytest tests/test_collection.py tests/test_analysis.py tests/test_build.py -q
+python -m pytest tests/test_collection.py tests/test_finalize.py tests/test_analysis.py tests/test_build.py -q
 node --test tests/frontend.test.js
 python scripts/build_site.py
 python -m pytest tests/test_browser.py -q
@@ -114,3 +114,13 @@ python -m pytest tests/test_browser.py -q
 参考了 [TrendRadar](https://github.com/sansan0/TrendRadar) 的职责边界与失败来源记录、[NewsNow](https://github.com/newsnext/newsnow) 的来源状态接口、[DailyHotApi](https://github.com/imsyy/DailyHotApi) 的更新时间与缓存来源表达。相关实现根据本项目需求独立编写。
 
 本地 ECharts 分发文件保留在 `docs/vendor/`，随附 Apache 2.0 LICENSE 与 NOTICE。
+
+## 采集恢复与诊断
+
+主采集由 GitHub Actions 每周一北京时间 08:00 调度，限时 25 分钟。网络、限流或验证失败的榜单通过 SSH 在阿里云独立环境补采，补采步骤限时 20 分钟；结构错误不会盲目重试。两端使用同一份采集代码，只选择整榜通过验证的结果。
+
+候选采集：`python scraper/crawl.py --week 2026-W44 --ranks signnewbook --output data/partial/manual/candidate.json`。合并发布：`python scripts/finalize_collection.py --primary data/partial/manual/github.json --fallback data/partial/manual/aliyun.json`。
+
+至少一个榜完整便发布，缺失榜不进入分析；全部失败或同周覆盖退步时保留原快照。部分发布后 Actions 最终状态仍标失败，诊断产物保留 14 天。失败 HTML、截图不进入公开网站。签约新书榜改用官方 signNewBkAll，口径版本与旧 signnewbook 隔离，不补造历史周。阿里云安装需预先具备 python3.12-venv。
+
+恢复设计参考 [novel-tracker](https://github.com/dylan-byte-max/novel-tracker/blob/main/scrapers/qidian.js)，重试复用 [Tenacity](https://github.com/jd/tenacity)。未照搬移动端不同榜单的替代映射。

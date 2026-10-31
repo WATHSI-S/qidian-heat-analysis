@@ -16,7 +16,7 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     env:
       VPS_HOST: ${{ secrets.VPS_HOST }}
     steps:
@@ -28,9 +28,63 @@ jobs:
           cache-dependency-path: scraper/requirements.lock
       - run: pip install -r scraper/requirements.txt
       - run: python -m playwright install --with-deps chromium
-      - name: Collect validated snapshot
-        id: crawl
-        run: python scraper/crawl.py
+      - name: Collect primary candidate
+        continue-on-error: true
+        timeout-minutes: 25
+        env:
+          COLLECTION_RUNNER: github
+        run: |
+          mkdir -p data/partial/current
+          week=$(TZ=Asia/Shanghai date +%G-W%V)
+          echo "COLLECTION_WEEK=$week" >> "$GITHUB_ENV"
+          python scraper/crawl.py --week "$week" --output data/partial/current/github.json
+      - name: Collect failed rankings on Alibaba VPS
+        if: env.VPS_HOST != ''
+        continue-on-error: true
+        timeout-minutes: 20
+        env:
+          VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+          VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+        run: |
+          ranks=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          from sys import path
+          path.insert(0, 'scraper')
+          from domain import RANK_LABELS
+          p = Path('data/partial/current/github.json')
+          outcomes = json.loads(p.read_text())['quality']['rankings'] if p.exists() else {}
+          eligible = {'network', 'blocked', 'rate_limited', 'server_error', None}
+          print(' '.join(rt for rt in RANK_LABELS if outcomes.get(rt, {}).get('status') != 'complete'
+                         and outcomes.get(rt, {}).get('reason') in eligible))
+          PY
+          )
+          if [ -z "$ranks" ]; then exit 0; fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          host="$VPS_USERNAME@$VPS_HOST"
+          remote="/opt/qidian-collector/$GITHUB_RUN_ID"
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new "$host" "mkdir -p '$remote'"
+          tar czf /tmp/qidian-collector.tgz scraper
+          scp -i ~/.ssh/deploy_key /tmp/qidian-collector.tgz "$host:$remote/source.tgz"
+          ssh -i ~/.ssh/deploy_key "$host" "set -e; cd '$remote'; tar xzf source.tgz; python3 -m venv /opt/qidian-collector/venv; /opt/qidian-collector/venv/bin/pip install -c scraper/requirements.lock playwright beautifulsoup4 lxml tenacity; /opt/qidian-collector/venv/bin/python -m playwright install --with-deps chromium"
+          ssh -i ~/.ssh/deploy_key "$host" "cd '$remote'; COLLECTION_RUNNER=aliyun timeout --signal=INT 900 /opt/qidian-collector/venv/bin/python scraper/crawl.py --week '$COLLECTION_WEEK' --ranks $ranks --output candidate/aliyun.json" || true
+          scp -i ~/.ssh/deploy_key "$host:$remote/candidate/aliyun.json" data/partial/current/aliyun.json || true
+          scp -r -i ~/.ssh/deploy_key "$host:$remote/candidate/diagnostics" data/partial/current/aliyun-diagnostics || true
+      - name: Finalize validated rankings
+        id: finalize
+        run: |
+          if [ ! -f data/partial/current/github.json ]; then
+            python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p = Path('data/partial/current/github.json')
+          p.parent.mkdir(parents=True, exist_ok=True)
+          p.write_text(json.dumps({'week':os.environ['COLLECTION_WEEK'],'source':'qidian','books':[], 'quality':{'rankings':{}}}))
+          PY
+          fi
+          python scripts/finalize_collection.py --primary data/partial/current/github.json --fallback data/partial/current/aliyun.json
       - name: Build deterministic summary
         run: python scraper/analysis/pipeline.py summary
       - name: Text mining
@@ -101,6 +155,7 @@ jobs:
         if: always()
         with:
           name: crawl-diagnostics
+          retention-days: 14
           path: |
             data/partial/
             data/analysis/*/run.json
@@ -110,3 +165,8 @@ jobs:
         with:
           name: static-site
           path: dist/site/
+      - name: Require complete collection after publication
+        if: steps.finalize.outputs.publication == 'partial'
+        run: |
+          echo "::error::Published verified rankings, but some rankings remain unavailable. See diagnostics."
+          exit 1

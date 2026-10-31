@@ -53,6 +53,8 @@ def forecast_series(values, predict=None):
 def forecast_categories(data_dir=DATA_DIR, week_label=None):
     current = load_week(data_dir, week_label)
     weeks = load_weeks(data_dir, current["week"])
+    definitions = {rt: q.get("definition_id") for rt, q in current["quality"]["rankings"].items()}
+    weeks = [w for w in weeks if all(q.get("definition_id") == definitions[rt] for rt, q in w["quality"]["rankings"].items())]
     complete = []
     # Do not compress missing/partial weeks into an apparently regular time series.
     following = None

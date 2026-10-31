@@ -120,7 +120,7 @@ def normalize_snapshot(raw):
             (supplied.get("status") == "complete" and
              (len(entries) >= expected or supplied.get("reason") == "source_end"))
             if not legacy else len(entries) >= 180)
-        ranks[rt] = {**supplied, "requested": expected, "actual": len(entries),
+        ranks[rt] = {"definition_id": "signnewbook_legacy" if rt == "signnewbook" else rt + "_v1", **supplied, "requested": expected, "actual": len(entries),
                      "depth": max(positions, default=0),
                      "status": "complete" if complete else "partial" if entries else "missing"}
     return {**raw, "source": "sample" if sample else raw.get("source", "qidian"),
@@ -161,7 +161,7 @@ def comparable(first, second):
     depths = {}
     for rt in RANK_LABELS:
         a, b = (s["quality"]["rankings"][rt] for s in (first, second))
-        if a["status"] == b["status"] == "complete":
+        if a["status"] == b["status"] == "complete" and a.get("definition_id") == b.get("definition_id"):
             depths[rt] = min(a["depth"], b["depth"])
     def select(snap):
         return [b for b in snap["books"] if b["rank_type"] in depths and

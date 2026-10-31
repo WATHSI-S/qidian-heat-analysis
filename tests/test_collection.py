@@ -12,7 +12,7 @@ from qidian_scraper.storage import get_week_label, save_weekly_snapshot
 
 def item(rank, malformed=False):
     heading = "" if malformed else f'<h2><a href="//www.qidian.com/book/{rank}/">Book {rank}</a></h2>'
-    return f'<li data-rid="{rank}">{heading}<p class="author"><a class="name">Author</a><a href="//www.qidian.com/xuanhuan">Fantasy</a><span>ongoing</span></p><p class="intro">Introduction</p></li>'
+    return f'<li data-rid="{(rank-1)%20+1}"><span class="rank-tag">{rank}</span>{heading}<p class="author"><a class="name">Author</a><a href="//www.qidian.com/xuanhuan">Fantasy</a><span>ongoing</span></p><p class="intro">Introduction</p></li>'
 
 
 def run_inline(coro):
@@ -26,8 +26,10 @@ def run_inline(coro):
 
 def crawl(pages, limit=200):
     page = AsyncMock()
-    page.content.side_effect = pages
+    page.content.side_effect = ['<div class="rank-body"><div class="book-img-text">'+html+'</div></div>' for html in pages]
+    page.url = "https://www.qidian.com/rank/yuepiao/"
     page.context = AsyncMock()
+    page.goto.return_value.status = 200
     with patch.object(rankings, "_new_page", return_value=page), patch.object(rankings.asyncio, "sleep", new=AsyncMock()):
         result = run_inline(rankings._scrape_rank_page(None, "yuepiao", limit))
     return result, page
@@ -40,16 +42,16 @@ def test_book_link_not_category_link():
 
 
 def test_tenth_page_is_visited_and_context_is_closed():
-    pages = ["<ul>" + "".join(item(n) for n in range(p * 20 + 1, p * 20 + 21)) + "</ul>" for p in range(10)]
+    pages = ["<ul>" + "".join(item(n) for n in range(p * 20 + 1, p * 20 + 21)) + f'</ul><a class="lbf-pagination-next" href="/rank/yuepiao/page{p+2}/">Next</a>' for p in range(10)]
     result, page = crawl(pages)
     assert result["status"] == "complete"
     assert len(result["books"]) == 200
-    assert page.goto.call_args_list[-1].args[0].endswith("?page=10")
+    assert page.goto.call_args_list[-1].args[0].endswith("/page10/")
     page.context.close.assert_awaited_once()
 
 
 def test_duplicate_page_is_partial():
-    page_html = "<ul>" + "".join(item(n) for n in range(1, 21)) + "</ul>"
+    page_html = "<ul>" + "".join(item(n) for n in range(1, 21)) + '</ul><a class="lbf-pagination-next" href="/rank/yuepiao/page2/">Next</a>'
     result, _ = crawl([page_html] * 6)
     assert result["status"] == "partial"
     assert result["actual"] == 20
@@ -66,12 +68,12 @@ def test_full_last_page_with_disabled_next_confirms_source_end():
 
 def test_parse_failure_does_not_renumber():
     html = "<ul>" + item(1) + item(2, malformed=True) + item(3) + "</ul>"
-    result, _ = crawl([html] * 3, 3)
-    assert [b["rank"] for b in result["books"]] == [1, 3]
-    assert result["status"] == "partial"
+    result, _ = crawl([html], 3)
+    assert [b["rank"] for b in result["books"]] == []
+    assert result["status"] == "failed"
 
 
-@pytest.mark.parametrize("html,expected", [("<html>probe.js</html>", "failed"), ('<div class="no-data"></div>', "complete")])
+@pytest.mark.parametrize("html,expected", [("<html>invalid</html>", "failed"), ('<div class="no-data"></div>', "complete")])
 def test_empty_state_must_be_explicit(html, expected):
     result, _ = crawl([html] * 3, 20)
     assert result["status"] == expected
@@ -110,3 +112,36 @@ def test_complete_snapshot_requires_all_rankings(tmp_path):
     path = save_weekly_snapshot(books, "2026-W44", quality, tmp_path)
     assert path.parent == tmp_path
     assert json.loads(path.read_text(encoding="utf-8"))["quality"]["status"] == "complete"
+
+def test_navigation_preserves_official_month_path():
+    assert rankings.next_url('https://www.qidian.com/rank/yuepiao/', '//www.qidian.com/rank/yuepiao/year2026-month11-page2/', 'yuepiao').endswith('/year2026-month11-page2/')
+    with pytest.raises(rankings.CollectionError):
+        rankings.next_url('https://www.qidian.com/rank/yuepiao/', '/rank/hotsales/page2/', 'yuepiao')
+
+
+def test_transient_navigation_retries_same_page():
+    import asyncio
+    from tenacity import wait_none
+    page=AsyncMock()
+    page.url='https://www.qidian.com/rank/yuepiao/'
+    response=AsyncMock()
+    response.status=200
+    page.goto.side_effect=[TimeoutError(), response]
+    page.content.return_value='<div class="rank-body"><div class="book-img-text">'+item(1)+'</div></div>'
+    with patch.object(rankings,'_new_page',return_value=page), patch.object(rankings,'wait_exponential_jitter',return_value=wait_none()):
+        result=asyncio.run(rankings._scrape_rank_page(None,'yuepiao',1))
+    assert result['status']=='complete'
+    assert result['attempts']==2
+    assert page.goto.call_args_list[0].args==page.goto.call_args_list[1].args
+
+
+def test_wrong_ranking_is_not_retried():
+    import asyncio
+    page=AsyncMock()
+    page.url='https://www.qidian.com/rank/'
+    page.goto.return_value.status=200
+    page.content.return_value='<div class="rank-body"></div>'
+    with patch.object(rankings,'_new_page',return_value=page):
+        result=asyncio.run(rankings._scrape_rank_page(None,'yuepiao',1))
+    assert result['reason']=='wrong_ranking'
+    assert page.goto.await_count==1

@@ -42,3 +42,5 @@ typing-inspection==0.4.2
 tzdata==2025.2
 # jieba imports pkg_resources but does not declare setuptools.
 setuptools==80.8.0
+
+tenacity==9.1.2
