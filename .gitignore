@@ -13,3 +13,9 @@ docs/data/
 data/cache/
 data/partial/
 tests/fixtures/sample/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
