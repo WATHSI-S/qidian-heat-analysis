@@ -1,0 +1,270 @@
+{
+  "n_weeks": 2,
+  "week_labels": [
+    "2026-W44",
+    "2026-W45"
+  ],
+  "categories": {
+    "仙侠": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 24.96
+        },
+        {
+          "week": "2026-W45",
+          "heat": 22.83
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "体育": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 1.94
+        },
+        {
+          "week": "2026-W45",
+          "heat": 1.95
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "军事": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 0.92
+        },
+        {
+          "week": "2026-W45",
+          "heat": 0.5
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "历史": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 13.91
+        },
+        {
+          "week": "2026-W45",
+          "heat": 14.49
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "奇幻": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 5.57
+        },
+        {
+          "week": "2026-W45",
+          "heat": 6.27
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "悬疑灵异": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 3.77
+        },
+        {
+          "week": "2026-W45",
+          "heat": 2.89
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "武侠": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 1.16
+        },
+        {
+          "week": "2026-W45",
+          "heat": 0.88
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "游戏": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 3.88
+        },
+        {
+          "week": "2026-W45",
+          "heat": 4.4
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "玄幻": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 33.46
+        },
+        {
+          "week": "2026-W45",
+          "heat": 33.46
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "现实": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 0.12
+        },
+        {
+          "week": "2026-W45",
+          "heat": 0.17
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "短篇": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 0.11
+        },
+        {
+          "week": "2026-W45",
+          "heat": 0.11
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "科幻": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 8.97
+        },
+        {
+          "week": "2026-W45",
+          "heat": 8.72
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "诸天无限": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 6.79
+        },
+        {
+          "week": "2026-W45",
+          "heat": 7.59
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "轻小说": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 32.71
+        },
+        {
+          "week": "2026-W45",
+          "heat": 32.74
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    },
+    "都市": {
+      "history": [
+        {
+          "week": "2026-W44",
+          "heat": 26.92
+        },
+        {
+          "week": "2026-W45",
+          "heat": 28.19
+        }
+      ],
+      "forecast": null,
+      "forecast_w2": null,
+      "reason": "insufficient_backtests",
+      "backtest_origins": 0
+    }
+  },
+  "comparison_depths": {
+    "yuepiao": 200,
+    "hotsales": 200,
+    "readindex": 200,
+    "recom": 200,
+    "collect": 200,
+    "newfans": 200,
+    "vipup": 200,
+    "signnewbook": 200
+  },
+  "experimental": true,
+  "schema_version": 2,
+  "week": "2026-W45",
+  "source_weeks": [
+    "2026-W44",
+    "2026-W45"
+  ],
+  "method_version": "2.0",
+  "generated_at": "2026-11-02T04:42:32.928470+00:00",
+  "updated_at": "2026-11-02T04:42:32.928470+00:00",
+  "status": "ok"
+}

@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "artifacts": {
+    "summary.json": {
+      "attempt_week": "2026-W45",
+      "attempt_status": "ok",
+      "attempted_at": "2026-11-02T04:42:26.971617+00:00",
+      "message": null,
+      "week": "2026-W45",
+      "path": "2026-W45/summary.json",
+      "status": "ok"
+    },
+    "keywords.json": {
+      "attempt_week": "2026-W45",
+      "attempt_status": "ok",
+      "attempted_at": "2026-11-02T04:42:30.428406+00:00",
+      "message": null,
+      "week": "2026-W45",
+      "path": "2026-W45/keywords.json",
+      "status": "ok"
+    },
+    "category_keywords.json": {
+      "attempt_week": "2026-W45",
+      "attempt_status": "ok",
+      "attempted_at": "2026-11-02T04:42:30.433871+00:00",
+      "message": null,
+      "week": "2026-W45",
+      "path": "2026-W45/category_keywords.json",
+      "status": "ok"
+    },
+    "genre_tags.json": {
+      "attempt_week": "2026-W45",
+      "attempt_status": "ok",
+      "attempted_at": "2026-11-02T04:42:30.472591+00:00",
+      "message": null,
+      "week": "2026-W45",
+      "path": "2026-W45/genre_tags.json",
+      "status": "ok"
+    },
+    "forecast.json": {
+      "attempt_week": "2026-W45",
+      "attempt_status": "ok",
+      "attempted_at": "2026-11-02T04:42:32.928470+00:00",
+      "message": null,
+      "week": "2026-W45",
+      "path": "2026-W45/forecast.json",
+      "status": "ok"
+    },
+    "association_rules.json": {
+      "attempt_week": "2026-W45",
+      "attempt_status": "ok",
+      "attempted_at": "2026-11-02T04:42:33.463486+00:00",
+      "message": null,
+      "week": "2026-W45",
+      "path": "2026-W45/association_rules.json",
+      "status": "ok"
+    },
+    "clusters.json": {
+      "attempt_week": "2026-W45",
+      "attempt_status": "ok",
+      "attempted_at": "2026-11-02T04:42:34.945686+00:00",
+      "message": null,
+      "week": "2026-W45",
+      "path": "2026-W45/clusters.json",
+      "status": "ok"
+    },
+    "anomalies.json": {
+      "attempt_week": "2026-W45",
+      "attempt_status": "ok",
+      "attempted_at": "2026-11-02T04:42:36.022130+00:00",
+      "message": null,
+      "week": "2026-W45",
+      "path": "2026-W45/anomalies.json",
+      "status": "ok"
+    },
+    "llm_insights.json": {
+      "attempt_week": "2026-W45",
+      "attempt_status": "ok",
+      "attempted_at": "2026-11-02T04:43:10.850919+00:00",
+      "message": null,
+      "week": "2026-W45",
+      "path": "2026-W45/llm_insights.json",
+      "status": "ok"
+    },
+    "weekly_report.json": {
+      "attempt_week": "2026-W45",
+      "attempt_status": "ok",
+      "attempted_at": "2026-11-02T04:43:24.692704+00:00",
+      "message": null,
+      "week": "2026-W45",
+      "path": "2026-W45/weekly_report.json",
+      "status": "ok"
+    }
+  },
+  "updated_at": "2026-11-02T04:43:24.693428+00:00"
+}

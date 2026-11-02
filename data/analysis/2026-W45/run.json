@@ -1,0 +1,20 @@
+{
+  "week": "2026-W45",
+  "stages": {
+    "summary": {
+      "status": "ok"
+    },
+    "text": {
+      "status": "ok"
+    },
+    "data": {
+      "status": "ok"
+    },
+    "llm": {
+      "status": "ok"
+    },
+    "report": {
+      "status": "ok"
+    }
+  }
+}
