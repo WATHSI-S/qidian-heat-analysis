@@ -1,0 +1,5 @@
+[Unit]
+Description=Renew short-lived workbench IP certificate
+[Service]
+Type=oneshot
+ExecStart=/opt/qidian-certbot/bin/certbot renew --quiet --deploy-hook "systemctl reload nginx"

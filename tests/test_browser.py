@@ -42,6 +42,18 @@ def new_page(browser, **kwargs):
     return page
 
 
+def test_rankings_are_usable_without_chart_library(browser_site):
+    browser, base = browser_site
+    page = new_page(browser)
+    page.route('**/vendor/echarts.min.js*', lambda route: route.abort())
+    try:
+        page.goto(base + '/#/rankings', wait_until='domcontentloaded')
+        page.wait_for_selector('tbody [data-book]')
+        assert page.locator('tbody tr').count() > 0
+    finally:
+        page.close()
+
+
 @pytest.mark.parametrize("route", ["rankings", "categories", "topics", "report"])
 def test_workspace_routes(browser_site, route):
     browser, base = browser_site

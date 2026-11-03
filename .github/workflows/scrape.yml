@@ -134,7 +134,7 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          rsync -avz --delay-updates --delete -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" dist/site/ "$VPS_USERNAME@$VPS_HOST:/var/www/qidian-heat-analysis/"
+          rsync -avz --chmod=D755,F644 --delay-updates --delete -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" dist/site/ "$VPS_USERNAME@$VPS_HOST:/var/www/qidian-heat-analysis/"
       - name: Stage summary
         if: always()
         run: |

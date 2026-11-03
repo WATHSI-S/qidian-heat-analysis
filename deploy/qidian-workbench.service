@@ -1,0 +1,26 @@
+[Unit]
+Description=Qidian author research workbench
+After=network.target
+
+[Service]
+User=qidian-workbench
+Group=qidian-workbench
+WorkingDirectory=/opt/qidian-workbench/current
+Environment=QIDIAN_DATA_DIR=/var/www/qidian-heat-analysis/data
+Environment=QIDIAN_SITE_DIR=/var/www/qidian-heat-analysis
+Environment=QIDIAN_PRIVATE_DIR=/var/lib/qidian-workbench
+Environment=QIDIAN_ALLOWED_HOSTS=47.102.40.95
+Environment=PLAYWRIGHT_BROWSERS_PATH=/opt/qidian-workbench/browsers
+EnvironmentFile=-/etc/qidian-workbench.env
+ExecStart=/opt/qidian-workbench/venv/bin/python -m uvicorn workbench.app:app --host 127.0.0.1 --port 8765 --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/qidian-workbench
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

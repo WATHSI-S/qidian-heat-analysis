@@ -90,7 +90,7 @@ export function showContext(snapshot, summary, artifacts = []) {
 export function initChart(domId) {
   const dom = document.getElementById(domId);
   if (!dom) return null;
-  if (!globalThis.echarts) { dom.textContent = '图表库不可用'; return null; }
+  if (!globalThis.echarts) { const library = document.querySelector('#chartLibrary'); dom.textContent = !library ? '图表库不可用' : library.dataset.failed ? '图表库加载失败，请刷新重试' : '图表库正在加载…'; return null; }
   const existing = charts.get(domId);
   if (existing && !existing.isDisposed()) return existing;
   const chart = globalThis.echarts.getInstanceByDom(dom) || globalThis.echarts.init(dom, null, { renderer: 'svg' });

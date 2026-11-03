@@ -1,5 +1,6 @@
 import {loadDashboard,loadAnalysisFile,esc,bookKey,bookLink,rankLabel,RANK_LABELS,initChart,disposeChart,darkAxis,darkTooltip,markdownHTML} from './js/shared.js';
 import {researchRenderers} from './js/research.js';
+window.addEventListener('charts-ready',()=>{if(!data)return;const tab=body.querySelector('[data-research].active')?.dataset.research;if(dialog.open&&tab)research(tab);else if(!dialog.open&&['categories','topics'].includes(view))render();});
 let data,epoch=0,drawerEpoch=0,view='rankings',returnFocus;
 const states={rankings:{mode:'heat',q:'',category:'',page:1,sort:'default',scroll:0},categories:{metric:'heat',scroll:0},topics:{metric:'keywords',category:'',scroll:0},report:{scroll:0}};
 const content=document.querySelector('#content'),dialog=document.querySelector('#drawer'),body=document.querySelector('#drawerBody');

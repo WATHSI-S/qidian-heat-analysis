@@ -1,6 +1,7 @@
 """Local research API. Never mounted by the public site builder."""
 import hashlib
 import json
+import os
 import re
 import sqlite3
 import sys
@@ -68,7 +69,12 @@ def parse_detail(html):
                 first_published=published.get('content') if published else None)
 
 
-def create_app(data_dir=ROOT / 'data', private_dir=ROOT / 'private'):
+def create_app(data_dir=None, private_dir=None, site_dir=None):
+    data_dir = Path(data_dir or os.environ.get('QIDIAN_DATA_DIR', ROOT / 'data'))
+    private_dir = Path(private_dir or os.environ.get('QIDIAN_PRIVATE_DIR', ROOT / 'private'))
+    site_dir = Path(site_dir or os.environ.get('QIDIAN_SITE_DIR', ROOT / 'dist/site'))
+    allowed_hosts = {'127.0.0.1', 'localhost', 'testserver'} | {
+        h.strip() for h in os.environ.get('QIDIAN_ALLOWED_HOSTS', '').split(',') if h.strip()}
     app = FastAPI(docs_url=None, redoc_url=None)
     private_dir = Path(private_dir)
     private_dir.mkdir(parents=True, exist_ok=True)
@@ -101,7 +107,7 @@ def create_app(data_dir=ROOT / 'data', private_dir=ROOT / 'private'):
     async def local_only(request: Request, call_next):
         host = request.headers.get('host', '').split(':')[0]
         origin = request.headers.get('origin')
-        if host not in ('127.0.0.1', 'localhost', 'testserver'):
+        if host not in allowed_hosts:
             return Response('Invalid host', status_code=403)
         if request.method not in ('GET', 'HEAD') and (
             origin and origin != f'{request.url.scheme}://{request.headers.get("host")}' or
@@ -305,7 +311,7 @@ def create_app(data_dir=ROOT / 'data', private_dir=ROOT / 'private'):
     @app.get('/market/')
     @app.get('/market/index.html')
     def market():
-        path = ROOT / 'dist/site/index.html'
+        path = site_dir / 'index.html'
         if not path.exists():
             return Response('请先运行 python scripts/build_site.py 构建榜单页面，再刷新。', status_code=503)
         html = path.read_text(encoding='utf-8').replace('</head>',
@@ -314,7 +320,7 @@ def create_app(data_dir=ROOT / 'data', private_dir=ROOT / 'private'):
         return Response(html, media_type='text/html')
 
     app.mount('/static', StaticFiles(directory=Path(__file__).parent / 'static'), name='static')
-    app.mount('/market', StaticFiles(directory=ROOT / 'dist/site', check_dir=False), name='market')
+    app.mount('/market', StaticFiles(directory=site_dir, check_dir=False), name='market')
     return app
 
 

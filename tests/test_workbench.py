@@ -41,6 +41,21 @@ def test_local_security(client):
     assert client.post('/api/import', json={'version': 1, 'project': None}).status_code == 422
 
 
+def test_explicit_server_host_and_external_storage(tmp_path, monkeypatch):
+    monkeypatch.setenv('QIDIAN_ALLOWED_HOSTS', '47.102.40.95')
+    monkeypatch.setenv('QIDIAN_PRIVATE_DIR', str(tmp_path / 'private'))
+    monkeypatch.setenv('QIDIAN_SITE_DIR', str(tmp_path / 'site'))
+    (tmp_path / 'site').mkdir()
+    (tmp_path / 'site/index.html').write_text('<head></head><body>server ranking</body>')
+    app = create_app()
+    with TestClient(app, base_url='https://47.102.40.95') as browser:
+        assert browser.post('/api/projects', json={}, headers={'Origin': 'https://47.102.40.95'}).status_code == 200
+        assert browser.post('/api/projects', json={}, headers={'Origin': 'https://evil.example'}).status_code == 403
+        assert 'server ranking' in browser.get('/market/').text
+        assert browser.get('/', headers={'Host': 'unknown.example'}).status_code == 403
+    assert (tmp_path / 'private/workbench.sqlite3').exists()
+
+
 def test_search_explains_and_does_not_fill_with_popular_books(client):
     assert client.get('/api/books?q=').json() == []
     assert client.get('/api/books?q=zzzzNONEXISTENT987654').json() == []
