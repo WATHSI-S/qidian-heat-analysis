@@ -23,12 +23,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - run: pip install -r scraper/requirements.txt
+      - run: pip install -r workbench/requirements.txt
       - run: python -m pytest tests/test_collection.py tests/test_finalize.py tests/test_analysis.py tests/test_build.py -q
       - run: node --test tests/frontend.test.js
       - run: python scripts/build_site.py
       - run: python -m playwright install --with-deps chromium
-      - run: python -m pytest tests/test_browser.py -q
+      - run: python -m pytest tests/test_browser.py tests/test_workbench.py -q
       - uses: actions/upload-artifact@v4
         if: always()
         with:
