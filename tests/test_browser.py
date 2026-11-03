@@ -54,6 +54,28 @@ def test_rankings_are_usable_without_chart_library(browser_site):
         page.close()
 
 
+def test_rankings_recover_from_truncated_summary(browser_site):
+    browser, base = browser_site
+    page = new_page(browser)
+    attempts = []
+
+    def summary_response(route):
+        attempts.append(route.request.url)
+        if len(attempts) == 1:
+            route.fulfill(status=200, content_type='application/json', body='{"week":')
+        else:
+            route.continue_()
+
+    page.route('**/data/analysis/*/summary.json', summary_response)
+    try:
+        page.goto(base + '/#/rankings', wait_until='domcontentloaded')
+        page.wait_for_selector('tbody [data-book]')
+        assert len(attempts) == 2
+        assert '工作台暂不可用' not in page.locator('#content').inner_text()
+    finally:
+        page.close()
+
+
 @pytest.mark.parametrize("route", ["rankings", "categories", "topics", "report"])
 def test_workspace_routes(browser_site, route):
     browser, base = browser_site

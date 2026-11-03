@@ -20,6 +20,13 @@ def test_build_uses_allowlist_and_preserves_raw_history(tmp_path):
     latest = json.loads((output / f"data/{week}.json").read_text(encoding="utf-8"))
     assert all(b["url"] is None or b["url"].startswith("https://www.qidian.com/book/") for b in latest["books"])
     assert not (output / "data/2026-W20.json").exists()
+    summary = json.loads((output / f"data/analysis/{week}/summary.json").read_text(encoding="utf-8"))
+    current_books = {(b["title"], b["author"]) for b in summary["heatScores"]}
+    assert {(b["title"], b["author"]) for b in summary["appearances"]} == current_books
+    full = builder.read_result(root / "data", week, "summary.json")
+    assert summary["heatScores"] == full["heatScores"]
+    assert summary["appearances"] == [b for b in full["appearances"] if (b["title"], b["author"]) in current_books]
+    assert summary["rankChanges"] == [{k: b[k] for k in ("title", "author", "rank_type", "delta")} for b in full["rankChanges"]]
     assert raw == {p.name: p.read_bytes() for p in (root / "data").glob("????-W??.json")}
     manifest = json.loads((output / "deployment-manifest.json").read_text(encoding="utf-8"))
     assert "vendor/echarts.min.js" in manifest["files"]

@@ -1,6 +1,46 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { esc, bookLink, safeBookURL, markdownHTML, initChart, chartCount, disposeCharts, fetchJSON } from '../docs/js/shared.js';
+import { esc, bookLink, safeBookURL, markdownHTML, initChart, chartCount, disposeCharts, fetchJSON, loadAnalysisFile } from '../docs/js/shared.js';
+
+test('failed JSON requests can be retried', async () => {
+  const original = globalThis.fetch;
+  let attempts = 0;
+  globalThis.fetch = async () => {
+    if (++attempts <= 2) throw new DOMException('Timed out', 'TimeoutError');
+    return { ok: true, json: async () => ({ recovered: true }) };
+  };
+  try {
+    await assert.rejects(fetchJSON('retry-test'), { name: 'TimeoutError' });
+    assert.deepEqual(await fetchJSON('retry-test'), { recovered: true });
+    assert.equal(attempts, 3);
+  } finally { globalThis.fetch = original; }
+});
+
+test('a truncated HTTP 200 JSON body is retried once for all consumers', async () => {
+  const original = globalThis.fetch;
+  let attempts = 0;
+  globalThis.fetch = async () => {
+    const attempt = ++attempts;
+    return { ok: true, json: async () => {
+      if (attempt === 1) throw new TypeError('Failed to fetch');
+      return { complete: true };
+    } };
+  };
+  try {
+    const results = await Promise.all([fetchJSON('truncated-body'), fetchJSON('truncated-body')]);
+    assert.deepEqual(results, [{ complete: true }, { complete: true }]);
+    assert.equal(attempts, 2);
+  } finally { globalThis.fetch = original; }
+});
+
+test('required summary preserves network failure instead of claiming missing data', async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => { throw new DOMException('Timed out', 'TimeoutError'); };
+  try {
+    await assert.rejects(loadAnalysisFile('summary.json', '2026-W45', false, true), /网络读取超时/);
+    assert.equal(await loadAnalysisFile('keywords.json', '2026-W45'), null);
+  } finally { globalThis.fetch = original; }
+});
 
 test('HTML text and attributes are escaped', () => {
   assert.equal(esc('<"a&\'b>'), '&lt;&quot;a&amp;&#39;b&gt;');

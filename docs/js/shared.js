@@ -44,16 +44,29 @@ export function markdownHTML(text) {
 export function fetchJSON(path) {
   const url = String(path);
   if (!requests.has(url)) {
-    requests.set(url, fetch(url, { cache: 'no-cache', signal: AbortSignal.timeout(15000) }).then(response => {
-      if (!response.ok) throw new Error(`HTTP ${response.status}: ${url}`);
-      return response.json();
+    const read = async () => {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        let response;
+        try {
+          response = await fetch(url, { cache: 'no-cache', signal: AbortSignal.timeout(60000) });
+          if (response.ok) return await response.json();
+        } catch (error) {
+          if (attempt === 0) continue;
+          throw error;
+        }
+        throw new Error(`HTTP ${response.status}: ${url}`);
+      }
+    };
+    requests.set(url, read().catch(error => {
+      requests.delete(url);
+      throw error;
     }));
   }
   return requests.get(url);
 }
 export const loadIndex = () => fetchJSON(new URL('index.json', DATA_BASE));
 export const loadWeekData = file => fetchJSON(new URL(file, DATA_BASE));
-export async function loadAnalysisFile(filename, week, allowStale = false) {
+export async function loadAnalysisFile(filename, week, allowStale = false, required = false) {
   try {
     const index = await loadIndex();
     const target = week || index.weeks.at(-1)?.week;
@@ -63,14 +76,17 @@ export async function loadAnalysisFile(filename, week, allowStale = false) {
     const result = await fetchJSON(new URL('analysis/' + entry.path, DATA_BASE));
     if (result.week !== entry.week) return null;
     return { ...result, stale: result.week !== target, attempt_status: entry.attempt_status, attempt_week: entry.attempt_week };
-  } catch { return null; }
+  } catch (error) {
+    if (required) throw new Error(`汇总数据加载失败：${['TimeoutError', 'AbortError'].includes(error.name) ? '网络读取超时，请重试' : error.message}`);
+    return null;
+  }
 }
 export async function loadDashboard() {
   const index = await loadIndex();
   const latest = index.weeks.at(-1);
   if (!latest) throw new Error('暂无真实采集数据');
-  const [snapshot, summary] = await Promise.all([loadWeekData(latest.file), loadAnalysisFile('summary.json', latest.week)]);
-  if (!summary) throw new Error('本周汇总不可用，请运行 analysis/pipeline.py summary');
+  const [snapshot, summary] = await Promise.all([loadWeekData(latest.file), loadAnalysisFile('summary.json', latest.week, false, true)]);
+  if (!summary) throw new Error('本周汇总与数据周不匹配，请检查发布产物');
   Object.assign(RANK_LABELS, index.rank_labels || {});
   return { index, snapshot, summary };
 }

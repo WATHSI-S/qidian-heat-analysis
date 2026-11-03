@@ -123,6 +123,15 @@ def build_site(source=ROOT, output=None, optional=True):
     if not read_result(data_dir, week, "weekly_report.json"):
         from analysis.llm_analyzer import run_report
         run_report(data_dir, week, allow_ai=False)
+    # The dashboard only looks up appearances for current books and needs no
+    # duplicated book descriptions in rank changes. Keep full analysis at source.
+    summary = read_result(data_dir, week, "summary.json")
+    current_books = {(b["title"], b["author"]) for b in summary["heatScores"]}
+    summary["appearances"] = [b for b in summary["appearances"] if (b["title"], b["author"]) in current_books]
+    summary["rankChanges"] = [{key: b[key] for key in ("title", "author", "rank_type", "delta")}
+                              for b in summary["rankChanges"]]
+    (data_dir / "analysis" / week / "summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
     verify_site(output)
     files = {p.relative_to(output).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
              for p in sorted(output.rglob("*")) if p.is_file() and p.name != "deployment-manifest.json"}
